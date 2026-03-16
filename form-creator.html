@@ -21,16 +21,23 @@
             </div>
         </div>
         <!--
-        the assignment editor has fields for question descriptions, answers, and grahs. 
+        the assignment editor has fields for question descriptions, answers, and media. 
+        
         -->
         <div class="assignment-editor">
-            <input class="questionDescriptionField" type="text" name="questionDescriptionField">
-            <input class="questionAnswerField" type="text" name="questionAnswerField">
+            <label for="questionDescriptionField">Description</label>
+            <input class="questionDescriptionField" type="text" id="questionDescriptionField">
+            <label for="questionMediaField" > Media </label>
+            <input class="questionMediaField" type="image" id="questionMediaField">
+            <label for="questionAnswerField"> Answer </label>
+            <input class="questionAnswerField" type="text" id="questionAnswerField">
             <button type="button" class="editorSubmit">
                 Add question
             </button>
-            <button type="button" class="editorUndo">
-                Undo last question
+            <label for="questionRemoveField">question to remove</label>
+            <input class="questionRemoveField" type="text" id="questionRemoveField">
+            <button type="button" class="editorUndo" onclick="removeQuestion()">
+                Remove question
             </button>
         </div>
     </body>
