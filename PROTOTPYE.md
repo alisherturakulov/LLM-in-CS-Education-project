@@ -1,5 +1,5 @@
 # Project Protoype
-
+Web app similar to socrates system: https://github.com/junli-cuny/Socrates
 ## Minimum Viable Product:
  ### Features:
  - Allow teachers to create assignments;
@@ -21,7 +21,7 @@
 	- Database to store students and assignment submissions
 	
  ### After prototype:
-	- Account system for Instructors and students:
-		- Instructors sign in with accounts while students can sign in or enter their students details on the assignment
+ - Account system for Instructors and students:
+ 	- Instructors sign in with accounts while students can sign in or enter their students details on the assignment
 	- Comment section to allow students to ask questions about the assingment; can be toggled by instructor to make visible to instructor/class only.
 	
