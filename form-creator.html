@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <!--
+        Client Side script controlls the addition of questions and
+        sending the questions objext to the server upon submission
+        -->
+        <script src="./form-script.js" defer></script>   
+    </head>
+    <body>
+        <div class="assignment-box">
+            <div class="question" id ="sample-question">
+                <p class="questionDescription">
+                    sample question here
+                </p>
+                <div class="questionInput">
+                    <input class="questionInputField" type="text/plain" name="questionInputField">
+                </div>
+            </div>
+        </div>
+        <!--
+        the assignment editor has fields for question descriptions, answers, and grahs. 
+        -->
+        <div class="assignment-editor">
+            <input class="questionDescriptionField" type="text" name="questionDescriptionField">
+            <input class="questionAnswerField" type="text" name="questionAnswerField">
+            <button type="button" class="editorSubmit">
+                Add question
+            </button>
+            <button type="button" class="editorUndo">
+                Undo last question
+            </button>
+        </div>
+    </body>
+</html>
