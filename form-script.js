@@ -1,17 +1,49 @@
 //client-side script for form-creator
+//to do: convert to react
 //submitted forms are saved to a database (temporarily data folder)
 
-const assignment = {};
+//object holds assignment objects
+const assignments = {};
+//= { firstAssignment:{}, secondAssignment{}, ...}
 
-//saves the assignment object
-function saveAssignment(){
+//assignment object 
+//{
+// title: "string",
+// description: "string", 
+// answer:"string", 
+// media:"path/to/media in /media or database location"
+//}
+
+/**
+ * saves the current assignment into the data folder or database
+ * @param {object} credentials if from a databse; for accessing
+ */
+function saveAssignment(credentials, title){
+
+}
+
+
+/**
+ * loads saved assingments from data folder/database into current assignment viewer
+ * @param {object} credentials credential obj if from a database; for accessing
+ */
+function loadAssignment(credentials, title){
 
 }
 
 /**
- * loads saved assingments from data folder/database
- * @param credentials if from a database; the credentials for access the database
+ * remove the specific assignment from list of assignments
+ * @param {object} credentials
+ * @param {integer} title 
  */
-function loadAssignment(credentials = null){
+function removeAssignment(credentials, title){
+
+}
+
+/**
+ * removes the question with the given id from the list of questions in the current assignment
+ * @param {string} questionId 
+ */
+function removeQuestion(questionId){
 
 }
