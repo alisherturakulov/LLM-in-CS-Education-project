@@ -5,7 +5,7 @@
         <meta name = "viewport" content="width=device-width, initial-scale=1.0">  
     </head>
     <body>
-        <button type="button" onclick="loadQuestions">
+        <button type="button" onclick="loadQuestions()">
             Load Quesitons
         </button>
         <div class="questionContainer">
@@ -13,17 +13,18 @@
             If multiple questions are received in json form from server,
             each h3 will have a number ordered by the index of the question
             -->
-            <h3>Question</h3>
-            <p class="question">
-                sample question
-            </p>
-            <p class="sampleSolution">
-                sample solution
-            </p>
-            <p>Enter the type of error in the solution: </p>
-            <input type="text" id="errorAnswer" placeholder="enter type of error">
-
-            <button type="button" onclick="submitAnswers">
+            <div class="question">
+                <h3>Question</h3>
+                <p class="question">
+                    sample question
+                </p>
+                <p class="sampleSolution">
+                    sample solution
+                </p>
+                <p>Enter the type of error in the solution: </p>
+                <input type="text" id="errorAnswer" placeholder="enter type of error">
+            </div>
+            <button type="button" onclick="submitAnswers()">
                 Submit Answers
             </button>
             
@@ -66,6 +67,6 @@
             }
 
         </script>
-        <script></script>
+        
     </body>
 </html>
