@@ -31,13 +31,16 @@ def home():
 @app.route('/api/get_questions', methods=['GET'])
 def get_questions():
     data = request.json
-    data.
+   
     questions = {}#to jsonify and send
     return jsonify(questions)
 
 @app.route('/api/submit_answers', methods=['POST'])
 def submit_answers():
     feedback = {} #in the same order as the answers were received
+     answers = data.get('errorAnswers','')
+    for i in range(len(answers)):
+        feedback.append(check_answer(answers[i]))
     return jsonify(feedback)
 
 //host app
