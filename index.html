@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">  
+    </head>
+    <body>
+        <button type="button" onclick="loadQuestions">
+            Load Quesitons
+        </button>
+        <div class="questionContainer">
+            <!--
+            If multiple questions are received in json form from server,
+            each h3 will have a number ordered by the index of the question
+            -->
+            <h3>Question</h3>
+            <p class="question">
+                sample question
+            </p>
+            <p class="sampleSolution">
+                sample solution
+            </p>
+            <p>Enter the type of error in the solution: </p>
+            <input type="text" id="errorAnswer" placeholder="enter type of error">
+
+            <button type="button" onclick="submitAnswers">
+                Submit Answers
+            </button>
+            
+        </div>
+        <script class="questionScript">
+            /**
+             * requests questions form the pipeline running on the server and
+             * adds questions with values in the container 
+             * with id values corresponding to index in server response 
+            */
+            function loadQuestions(){
+
+            }
+
+            /**
+             * Submits the error answers to the server pipeline
+             * returns the feedback from the server on the error answer
+             * @return {string} the feedback on the correctness of the user errorAnswer
+            */
+            function submitAnswers(){
+
+            }
+
+            /**
+             * gets the string input value of the errorAnswer field
+             * @return {string} errorAnswer input value from user
+            */
+            function getErrorInput(){
+
+            }
+
+            /**
+             * gets the feedback to the list of answers  from the server
+             * errorAnswer indices are in the same order as the questions were received in
+             * @param {string[]} 
+             * 
+            */
+            function checkErrorAnswers(errorAnswers){
+
+            }
+
+        </script>
+        <script></script>
+    </body>
+</html>
