@@ -22,7 +22,7 @@
                     sample solution
                 </p>
                 <p>Enter the type of error in the solution: </p>
-                <input type="text" id="errorAnswer" placeholder="enter type of error">
+                <input type="text" class="errorAnswer" id="errorAnswer" placeholder="enter type of error">
             </div>
             <button type="button" onclick="submitAnswers()">
                 Submit Answers
@@ -36,7 +36,7 @@
              * with id values corresponding to index in server response 
             */
             function loadQuestions(){
-
+                
             }
 
             /**
@@ -45,15 +45,22 @@
              * @return {string} the feedback on the correctness of the user errorAnswer
             */
             function submitAnswers(){
-
+                let errorInputsList = getErrorInputs();
+                let data = {errorInputs: errorInputsList};
+                //next sends the data to server.
             }
 
             /**
              * gets the string input value of the errorAnswer field
-             * @return {string} errorAnswer input value from user
+             * @return {string[]} errorAnswer input value from user
             */
-            function getErrorInput(){
-
+            function getErrorInputs(){
+                let errorInputs = [];
+                let questionContainer = document.querySelector(".questionContainer");
+                for(let input of questionContainer.getElementsByClassName(".errorAnswer")){
+                    errorInputs.push(input.valueOf());
+                }
+                return errorInputs;
             }
 
             /**
