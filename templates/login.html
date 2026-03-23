@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">  
+    </head>
+    <body>
+       
+       <form class="login" onsubmit="login()" method="post">
+         <input type="text" id="username" required>
+         <input type="password" id="password" required>
+         <input type="submit">
+       </form>
+       <form class="signup" onsubmit="signup()" method="post">
+        <input type="text" id="newUsername" required>
+        <input type="password" id="newPassword" minlength="8" required>
+        <input type="submit">
+       </form>
+        <script class="questionScript">
+            /**
+             * Checks the login credentials
+            */
+            function login(){
+                //get input values
+                let username = document.querySelector("#username").textContent;
+                let password = document.querySelector("#password").textContent;
+                //check password and user with what is stored
+                
+                 //sign in the user by sending a link
+                let form = document.querySelector(".login");
+                let signup_data = new FormData(form);
+
+                
+            }
+
+            /**
+             * Signs up a new teacher account
+            */
+            function signup(){
+                //get input values
+                let username = document.querySelector("#newUsername").textContent;
+                let password = document.querySelector("#newPassword").textContent;
+                //ensure there are no conflicts with exisiting credentials 
+                //sign in the user by redirecting
+                let form = document.querySelector(".signup");
+                let signup_data = new FormData(form);
+            }
+
+          
+        </script>
+        
+    </body>
+</html>
