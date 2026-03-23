@@ -3,18 +3,33 @@
     <head>
         <meta charset="utf-8">
         <meta name = "viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="../static/styles.css">
+        <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"> -->
+        <link rel="stylesheet" href="../static/css/styles.css">
     </head>
     <body>
        
        <form class="login" onsubmit="login()" method="post">
-         <input type="text" id="username" required>
-         <input type="password" id="password" required>
+         <p>Login</p>
+         <label>
+            Username
+            <input type="text" id="username" required>
+         </label>
+         <label>
+            Password
+            <input type="password" id="password" required>
+         </label>
          <input type="submit">
        </form>
        <form class="signup" onsubmit="signup()" method="post">
-        <input type="text" id="newUsername" required>
-        <input type="password" id="newPassword" minlength="8" required>
+        <p>Signup</p>
+        <label>
+            New Username
+            <input type="text" id="newUsername" required>
+        </label>
+        <label>
+            New Password
+            <input type="password" id="newPassword" minlength="8" required>
+        </label>
         <input type="submit">
        </form>
         <script class="questionScript">

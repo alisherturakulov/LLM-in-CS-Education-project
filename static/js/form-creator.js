@@ -15,10 +15,10 @@ const assignments = {};
 //}
 
 /**
- * saves the current assignment into the data folder or database
+ * generates the current assignment and saves into the database
  * @param {object} credentials if from a databse; for accessing
  */
-function saveAssignment(credentials, title){
+function generateAssignment(credentials, title){
 
 }
 
