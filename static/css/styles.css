@@ -1,0 +1,11 @@
+/*
+Styles for index.html form
+*/
+
+body{
+  display:flex;
+  flex-flow:column nowrap;  
+  flex-grow:1;
+  flex-shrink: 1;
+  background-color:floralwhite;
+}
