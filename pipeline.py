@@ -5,17 +5,86 @@ import time
 import os
 from python-dotenv import load_dotenv
 from openai import OpenAI
+import base64
+from google import genai
+from google.genai import types
+
+from google import genai
 
 #load from .env file
 load_dotenv()
 
-os.environ['OPENAI_API_KEY'] = "your_api_key_here"#will use dotenv
+os.getenv('OPENAI_API_KEY') #from dotenv
+os.getenv('GEMINI_API_KEY') 
+
+#LLM client setup
 clientOpenAI = OpenAI()
 
 
 app = Flask(__name__)
 
-#function to generate response from chosen openai model
+
+def generateGemini(prompt, model="gemini-2.0-flash"):
+    client = genai.Client(
+        api_key=os.environ.get("GEMINI_API_KEY"),
+    )
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=prompt),
+            ],
+        ),
+    ]
+    if model == "gemini-2.0-flash":
+        generate_content_config = types.GenerateContentConfig(
+            temperature=1,
+            top_p=0.95,
+            top_k=40,
+            max_output_tokens=8192,
+            response_mime_type="text/plain",
+    )
+    elif model in ["gemini-2.5-flash-preview-04-17", "gemini-2.5-pro-preview-05-06"]:
+        generate_content_config = types.GenerateContentConfig(
+          temperature=1.5,
+          response_mime_type="text/plain",
+      )
+    else:
+        generate_content_config = types.GenerateContentConfig(
+            temperature=0.7,
+            top_p=0.95,
+            top_k=64,
+            max_output_tokens=65536,
+            response_mime_type="text/plain",
+        )
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=generate_content_config)
+    return response.text
+
+#generate OpenAI response using some model in response to some user content and system_prompt
+def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high"):
+  if model == "o3-mini":
+    completion = clientOpenAI.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": content}
+        ],
+        reasoning_effort=reasoning_effort
+    )
+  else:
+      completion = clientOpenAI.chat.completions.create(
+          model=model,
+          temperature= temperature,
+          messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": content}
+          ],
+    )
+  return completion
+#generates a response using a given model with given user content and system_prompt
 def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high"):
   if model == "o3-mini":
     completion = clientOpenAI.chat.completions.create(
@@ -124,8 +193,11 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
   return log 
 
 #use pipeline from notebook
-def send_question():
-    return ""
+def generate_question( question:str, answer: str, model_generate:str, model_examine:str):
+    if(openAI.agent.is){
+
+    }
+    return pipline2(question, answer, model_generate, model_examine)
 
 def check_answer():
     return ""
