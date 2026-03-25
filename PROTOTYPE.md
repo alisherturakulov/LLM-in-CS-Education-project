@@ -24,6 +24,14 @@ Web app similar to socrates system: https://github.com/junli-cuny/Socrates
 	- Each instructor has a column of assignments
 	- Each assignment has a column of submissions
 	- Submissions have a columnf for submission time, time taken, token usage, chat history/submission logs, and the generated task itself
+
+ #### DB structure (listing columns):
+ - Instructors (users) Table
+	- Each instructor: username, password hash, authored assignments table;
+		- Assignments have creation date, number of questions to generate, and submissions table;
+			- Submissions have submission data, time taken, token usage, chat history/submission logs, and a table of the generated task itself.
+
+
 	
  ### After prototype:
 - Comment section to allow students to ask questions about the assingment; can be toggled by instructor to make visible to instructor/class only.
