@@ -1,3 +1,4 @@
+<!-- {% extends "base.html" %} -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -7,7 +8,7 @@
         <link rel="stylesheet" href="../static/css/styles.css">
     </head>
     <body>
-       
+    <!-- {%block body%} -->
        <form class="login" onsubmit="login()" method="post">
          <p>Login</p>
          <label>
@@ -64,6 +65,6 @@
 
           
         </script>
-        
+        <!-- {%endblock%} -->
     </body>
 </html>
