@@ -1,14 +1,12 @@
 #will hold the data pipline that will run using flask to send a list of questions
 #and then check the answers submitted by the user
-from flask import Flask, render_template, request, jsonify
 import time
 import os
-from python-dotenv import load_dotenv
+from dotenv import load_dotenv
 from openai import OpenAI
 import base64
 from google import genai
 from google.genai import types
-
 from google import genai
 
 #load from .env file
@@ -20,9 +18,8 @@ os.getenv('GEMINI_API_KEY')
 #LLM client setup
 clientOpenAI = OpenAI()
 
-
-app = Flask(__name__)
-
+#list of error types ordered by index corresponding to that in pipline notebook
+error_types = []
 
 def generateGemini(prompt, model="gemini-2.0-flash"):
     client = genai.Client(
@@ -64,27 +61,6 @@ def generateGemini(prompt, model="gemini-2.0-flash"):
     return response.text
 
 #generate OpenAI response using some model in response to some user content and system_prompt
-def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high"):
-  if model == "o3-mini":
-    completion = clientOpenAI.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content}
-        ],
-        reasoning_effort=reasoning_effort
-    )
-  else:
-      completion = clientOpenAI.chat.completions.create(
-          model=model,
-          temperature= temperature,
-          messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content}
-          ],
-    )
-  return completion
-#generates a response using a given model with given user content and system_prompt
 def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high"):
   if model == "o3-mini":
     completion = clientOpenAI.chat.completions.create(
@@ -193,37 +169,44 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
   return log 
 
 #use pipeline from notebook
-def generate_question( question:str, answer: str, model_generate:str, model_examine:str):
-    if(openAI.agent.is){
+def generate_questions(number_of_questions: int):
+    # if(openAI.agent.is){
 
+    # }
+    question = ""
+    answer = ""
+    model_generate = ""
+    model_examine = ""
+    questions = {
+        "1": {
+            question:"",
+            generated_answer:"",
+            error_expected: int,
+        },
+        "2":{
+            question:"",
+            generated_answer:"",
+            error_expected: int,
+        },
+        "2":{
+            question:"",
+            generated_answer:"",
+            error_expected: int,
+        },
     }
-    return pipline2(question, answer, model_generate, model_examine)
+    return questions
+    #return pipline2(question, answer, model_generate, model_examine)
 
-def check_answer():
-    return ""
+#check a given answer against the question and error type expected in the answer
+def check_answer(question_and_sample_answer: str, answer: str, expected_error_type: str):
+  instructions= """ verify and give concise feedback on the students answer
+                    identifying the error in the sample answer to the question
+                """
+  return ""
 
 #flask routing
 
-@app.route('/')
-def home():
-    render_template('index.html')#uses jinja template engine
-
-@app.route('/api/get_questions', methods=['GET'])
-def get_questions():
-    data = request.json
-   
-    questions = {}#to jsonify and send
-    return jsonify(questions)
-
-@app.route('/api/submit_answers', methods=['POST'])
-def submit_answers():
-    feedback = {} #in the same order as the answers were received
-     answers = data.get('errorAnswers','')
-    for i in range(len(answers)):
-        feedback.append(check_answer(answers[i]))
-    return jsonify(feedback)
-
 # //host app
-# if __name__ == 'main':
-#     app.run(debug=True)
+#  if __name__ == 'main':
+#      app.run(debug=True)
     
