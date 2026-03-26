@@ -1,20 +1,6 @@
 {% extends 'base.html' %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
-        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> -->
-        <link rel="stylesheet" href="../static/css/styles.css">
-        <!--
-        Client Side script controlls the addition of questions and
-        sending the questions objext to the server upon submission
-        -->
-        <script src="../static/js/form-creator.js" defer></script>   
-        <!-- <script src="{{ url_for('static', filename='js/form-creator.js') }}" defer></script> -->
-    </head>
-    <body>
-        <!-- {% block body %} -->
+
+    {% block body %} 
         <div class="assignment-box">
             <div class="question" id ="sample-question">
                 <p class="questionDescription">
@@ -33,9 +19,14 @@
         </div>
         <!--
         the assignment editor has fields for question descriptions, answers, and media. 
-        
+        Currently only for number of questions to generate.
         -->
-        <div class="assignment-editor">
+        <form id="assignmentGenerator" action="" method="POST">
+            {{form.number.label}}
+            {{form.number}}
+            {{form.submit.label}}
+            {{form.submit}}
+            <!-- 
             <label for="questionDescriptionField">Description
                 <input class="questionDescriptionField" type="text" id="questionDescriptionField">
             </label>
@@ -52,11 +43,11 @@
             </button>
             <label for="questionRemoveField">question to remove
                 <input class="questionRemoveField" type="text" id="questionRemoveField">
-            </label>
+            </label> 
+            
             <button type="button" class="editorUndo" onclick="removeQuestion()">
                 Remove question
-            </button>
-        </div>
-        <!-- {% endblock %} -->
-    </body>
-</html>
+            </button> 
+            -->
+        </form>
+    {% endblock %}

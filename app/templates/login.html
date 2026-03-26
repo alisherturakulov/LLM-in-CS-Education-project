@@ -1,70 +1,74 @@
-<!-- {% extends "base.html" %} -->
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
-        <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"> -->
-        <link rel="stylesheet" href="../static/css/styles.css">
-    </head>
-    <body>
-    <!-- {%block body%} -->
-       <form class="login" onsubmit="login()" method="post">
-         <p>Login</p>
-         <label>
-            Username
-            <input type="text" id="username" required>
-         </label>
-         <label>
-            Password
-            <input type="password" id="password" required>
-         </label>
-         <input type="submit">
-       </form>
-       <form class="signup" onsubmit="signup()" method="post">
-        <p>Signup</p>
-        <label>
-            New Username
-            <input type="text" id="newUsername" required>
-        </label>
-        <label>
-            New Password
-            <input type="password" id="newPassword" minlength="8" required>
-        </label>
-        <input type="submit">
-       </form>
+{% extends "base.html" %}
+
+    {%block body%}
+        <h2>
+            Login To Account
+        </h2>
+        <form class="login" onsubmit="login()" method="post">
+            <p>Login</p>
+            <label>
+                Username
+                <input type="text" id="username" required>
+            </label>
+            <label>
+                Password
+                <input type="password" id="password" required>
+            </label>
+            <input type="submit">
+        </form>
+
+        <h2>
+            Create New Account
+        </h2>
+        <form class="signup" onsubmit="signup()" method="post">
+            <p>Signup</p>
+            <label>
+                New Username
+                <input type="text" id="newUsername" required>
+            </label>
+            <label>
+                New Password
+                <input type="password" id="newPassword" minlength="8" required>
+            </label>
+            <input type="submit">
+        </form>
         <script class="questionScript">
             /**
              * Checks the login credentials
             */
-            function login(){
+            async function login(){
                 //get input values
-                let username = document.querySelector("#username").textContent;
-                let password = document.querySelector("#password").textContent;
+                // let username = document.querySelector("#username").textContent;
+                // let password = document.querySelector("#password").textContent;
                 //check password and user with what is stored
                 
                  //sign in the user by sending a link
                 let form = document.querySelector(".login");
-                let signup_data = new FormData(form);
-
-                
+                let signin_data = new FormData(form);
+                await fetch("./login.html", {
+                    body: signin_data,
+                    method: "POST"},
+                );
             }
 
             /**
              * Signs up a new teacher account
             */
-            function signup(){
+            async function signup(){
                 //get input values
-                let username = document.querySelector("#newUsername").textContent;
-                let password = document.querySelector("#newPassword").textContent;
+                // let username = document.querySelector("#newUsername").textContent;
+                // let password = document.querySelector("#newPassword").textContent;
                 //ensure there are no conflicts with exisiting credentials 
                 //sign in the user by redirecting
                 let form = document.querySelector(".signup");
                 let signup_data = new FormData(form);
+                await fetch("./login.html", {
+                    body: signup_data,
+                    method: "POST"
+                },
+            );
             }
 
           
         </script>
-        <!-- {%endblock%} -->
-    </body>
-</html>
+    {%endblock%}

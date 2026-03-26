@@ -3,16 +3,22 @@ from app import app
 from flask import render_template, request, jsonify
 from pipeline import check_answer, pipeline2
 
-@app.route('/')
-@app.route('/index')
+#import db from module where initialized 
+
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def home():
     #check db for authentication
+    
     logged_in = True
     
     if (logged_in):
-        render_template('form-creator.html')#uses jinja template engine
+        return render_template('form-creator.html')#uses jinja template engine
     else:
-        return "error 401 incorrect credentials"
+        return render_template('login.html')
+
 
 @app.route('/create-assignment', methods=['GET'])
 def create_questions():
@@ -23,30 +29,34 @@ def create_questions():
     #get questions from pipline
     questions = generate_questions(number_of_qs)
    #sample questions dictionary 
-    questions = {
-        "1": {
-            question:"",
-            generated_answer:"",
-            error_expected: int,
-        },
-        "2":{
-            question:"",
-            generated_answer:"",
-            error_expected: int,
-        },
-        "2":{
-            question:"",
-            generated_answer:"",
-            error_expected: int,
-        },
-    }#to jsonify and pass into template
-    render_template('index.html', questions)
+    #questions = {
+    #     "1": {
+    #         question:"",
+    #         generated_answer:"",
+    #         error_expected: int,
+    #     },
+    #     "2":{
+    #         question:"",
+    #         generated_answer:"",
+    #         error_expected: int,
+    #     },
+    #     "2":{
+    #         question:"",
+    #         generated_answer:"",
+    #         error_expected: int,
+    #     },
+    # }
+    #to jsonify and pass into template
+    return render_template('index.html', questions)
 
 
 @app.route('/api/submit-assignment', methods=['POST'])
 def submit_answers():
-    feedback = {} #in the same order as the answers were received
-    data = {}
+    feedback = {
+        #in the same order as the answers were received
+        #"1":"",#commment out once db is setup
+        } 
+    data = request.json
     answers = data.get('errorAnswers','')
     for i in range(len(answers)):
         feedback.append(check_answer(answers[i]))

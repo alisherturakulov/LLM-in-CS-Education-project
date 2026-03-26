@@ -10,6 +10,7 @@ body{
   background-color:floralwhite;
   align-items:center;
   overflow-y:scroll;
+  margin: 0.5%;
 }
 
 .assignment-box, .assignment-editor, label, input{
