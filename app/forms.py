@@ -1,24 +1,30 @@
 from app import app
 from flask_wtf import FlaskForm
-from flask_wtf import StringField, PasswordField, NumberField
+from wtforms import StringField, PasswordField, IntegerField, BooleanField
+from wtforms.validators import DataRequired
 
 #for logging in
-Class login(FlaskForm):
-    username = StringField("username")
-    password
+class Login(FlaskForm):
+    username = StringField("username", validators=[DataRequired()])
+    password = PasswordField("password", validators=[DataRequired()])
+    remember_me = BooleanField("remember_me", validators=[DataRequired()])
+
 
 #for new account creation
-Class signup():
-    new_username
-    new_password
+class Signup():
+    username = StringField("username", validators=[DataRequired()])
+    password = PasswordField("passowrd", validators=[DataRequired()])
+    submit = SubmitField("Sign Up")
 
 #assignment creation
-Class createAssignment(FlaskForm):
-    number_of_qs
+class CreateAssignment(FlaskForm):
+    number_of_qs = IntegerField("questionCount", validators=[DataRequired()])
+    submit = SubmitField("Create Assignment")
 
 #assignment submission
-Class submit(FlaskForm):
-    student_name
-    student_id
-    answers = {answer1: str...}
+class Submit(FlaskForm):
+    student_name = SringField("studentName", validators=[DataRequired()])
+    student_id = StringField("studentID", validators=[DataRequired()])
+    answers = FieldList(StringField("answer"), min_entries=1)
+    submit = SubmitField("Submit Assignment")
 

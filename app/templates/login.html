@@ -4,24 +4,40 @@
         <h2>
             Login To Account
         </h2>
-        <form class="login" onsubmit="login()" method="post">
-            <p>Login</p>
-            <label>
+        <form class="Login" action="" method="post">
+            {{ login_form.hidden_tag() }}
+            {{ login_form.username.label }}
+            {{ login_form.username }}
+            {{ login_form.password.label }}
+            {{ login_form.password }}
+            {{ login_form.remember_me.label }}
+            {{ login_form.remember_me }}
+            {{ login_form.submit.label }}
+            {{ login_form.submit }}
+            <!-- <label>
                 Username
                 <input type="text" id="username" required>
             </label>
+            
             <label>
                 Password
                 <input type="password" id="password" required>
             </label>
-            <input type="submit">
+            <input type="submit"> -->
         </form>
 
         <h2>
             Create New Account
         </h2>
-        <form class="signup" onsubmit="signup()" method="post">
-            <p>Signup</p>
+        <form class="Signup" action="" method="post">
+            {{ signup_form.hidden_tag() }}
+            {{ signup_form.username.label }}
+            {{ signup_form.username }}
+            {{ signup_form.password.label }}
+            {{ signup_form.password }}
+            {{ signup_form.submit.label }}
+            {{ signup_form.submit }}
+            <!-- <p>Signup</p>
             <label>
                 New Username
                 <input type="text" id="newUsername" required>
@@ -30,7 +46,7 @@
                 New Password
                 <input type="password" id="newPassword" minlength="8" required>
             </label>
-            <input type="submit">
+            <input type="submit"> -->
         </form>
         <script class="questionScript">
             /**
