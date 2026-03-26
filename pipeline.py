@@ -332,10 +332,14 @@ def check_answer(question_and_sample_answer: str, answer: str, expected_error_ty
   instructions= """ verify and give concise feedback on the students answer
                     identifying the error in the sample answer to the question
                 """
-  return ""
+  return "placeholder"
 
-def check_answer(answers: dict[str:str]):
-  
+def check_answers(answers):
+  #need to access the db column of actual answers form when the problems were generated
+  #then compare with the answer received using inputStr.indexOf(expectedStr.toLower())
+  # for(answer in answers.values()):
+
+    check_answer()
 #flask routing
 
 # //host app
