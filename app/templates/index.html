@@ -1,15 +1,24 @@
 {% extends "base.html" %}
 
         {% block body %}
-        <button type="button" onclick="loadQuestions()">
+        <!-- <button type="button" onclick="loadQuestions()">
             Load Quesitons
-        </button>
-        <div class="questionContainer">
+        </button> -->
+        <form class="assignment" action="" method="post">
             <!--
             If multiple questions are received in json form from server,
             each h3 will have a number ordered by the index of the question
             -->
-            <div class="question">
+            {{questions.hidden_tag()}}
+            {# Use a loop to go through the FieldList #}
+            {% for question_index in questions.keys %}
+                {{question_index+1}}
+                {{questions[question_index].label}}
+                {{questions[question_index]()}}
+            {% endloop %}
+                {{questions.submit.label}}
+                {{questions.submit()}}
+            <!-- <div class="question">
                 <h3>Question</h3>
                 <p class="question">
                     sample question
@@ -23,8 +32,8 @@
             <button type="button" onclick="submitAnswers()">
                 Submit Answers
             </button>
-            
-        </div>
+             -->
+        </form>
         <script class="questionScript">
             /**
              * requests questions form the pipeline running on the server and

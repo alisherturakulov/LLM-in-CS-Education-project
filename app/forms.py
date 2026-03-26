@@ -1,6 +1,6 @@
 from app import app
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, IntegerField, BooleanField, SubmitField, FieldList
 from wtforms.validators import DataRequired
 
 #for logging in
@@ -23,7 +23,7 @@ class CreateAssignment(FlaskForm):
 
 #assignment submission
 class Submit(FlaskForm):
-    student_name = SringField("Student Name", validators=[DataRequired()])
+    student_name = StringField("Student Name", validators=[DataRequired()])
     student_id = StringField("Student ID", validators=[DataRequired()])
     answers = FieldList(StringField("answer"), min_entries=1)
     submit = SubmitField("Submit Assignment")

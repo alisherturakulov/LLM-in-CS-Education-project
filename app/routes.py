@@ -13,9 +13,8 @@ def home():
     #check db for authentication
     login_form = Login()
     signup_form = Signup()
-    logged_in = Login.validate_on_submit()
     
-    if (logged_in):
+    if (login_form.validate_on_submit()):
         return redirect('/assign')
     if(signup_form.validate_on_submit()):
         return redirect("/assign")
@@ -56,8 +55,8 @@ def create_questions():
         # }
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
-        return redirect("index.html", questions=questions)
-        #return redirect("index.html")
+        return render_template("index.html", questions=questions)
+        #return redirect("index.html") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
 

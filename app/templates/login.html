@@ -7,13 +7,13 @@
         <form class="Login" action="" method="post">
             {{ login_form.hidden_tag() }}
             {{ login_form.username.label }}
-            {{ login_form.username }}
+            {{ login_form.username() }}
             {{ login_form.password.label }}
-            {{ login_form.password }}
+            {{ login_form.password() }}
             {{ login_form.remember_me.label }}
-            {{ login_form.remember_me }}
+            {{ login_form.remember_me() }}
             {{ login_form.submit.label }}
-            {{ login_form.submit }}
+            {{ login_form.submit() }}
             <!-- <label>
                 Username
                 <input type="text" id="username" required>
@@ -32,11 +32,11 @@
         <form class="Signup" action="" method="post">
             {{ signup_form.hidden_tag() }}
             {{ signup_form.username.label }}
-            {{ signup_form.username }}
+            {{ signup_form.username() }}
             {{ signup_form.password.label }}
-            {{ signup_form.password }}
+            {{ signup_form.password(size=8) }}
             {{ signup_form.submit.label }}
-            {{ signup_form.submit }}
+            {{ signup_form.submit() }}
             <!-- <p>Signup</p>
             <label>
                 New Username

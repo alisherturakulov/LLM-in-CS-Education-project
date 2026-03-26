@@ -21,11 +21,12 @@
         the assignment editor has fields for question descriptions, answers, and media. 
         Currently only for number of questions to generate.
         -->
-        <form id="assignmentGenerator" action="" method="POST">
+        <form id="assignment" action="" method="post">
+            {{form.hidden_tag()}}
             {{form.number.label}}
-            {{form.number}}
+            {{form.number()}}
             {{form.submit.label}}
-            {{form.submit}}
+            {{form.submit()}}
             <!-- 
             <label for="questionDescriptionField">Description
                 <input class="questionDescriptionField" type="text" id="questionDescriptionField">
