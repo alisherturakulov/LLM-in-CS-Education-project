@@ -1,6 +1,6 @@
 #routing for flask project
 from app import app
-from flask import render_template, request, jsonify
+from flask import render_template, request, redirect, jsonify
 from pipeline import check_answer, pipeline2
 from app.forms import Login, Signup, CreateAssignment, Submit
 #import db from module where initialized 
@@ -14,10 +14,19 @@ def home():
     login_form = Login()
     signup_form = Signup()
     
-    if (login_form.validate_on_submit()):
-        return redirect('/assign')
-    if(signup_form.validate_on_submit()):
-        return redirect("/assign")
+    if (request.method=="POST"):
+        if(login_form.validate_on_submit()):
+            username = login_form.username.data
+            password= login_form.password.data
+            remember_me = login_form.remember_me.data
+            #in db match password hashed with the stored password hash under instructor_id with this username
+            return redirect('/assign')
+        if(signup_form.validate_on_submit()):
+            username = signup_form.username.data
+            password = signup_form.password.data
+            #make sure username's not a duplicate
+            #store in db under new userid
+            return redirect("/assign")
     
     return render_template('login.html', login_form=login_form, signup_form=signup_form)
 
@@ -25,9 +34,9 @@ def home():
 @app.route('/assign', methods=['GET'])
 def create_questions():
     assign_form = CreateAssignment()
-    data = request.json#formdata json object receive
+    data = request.data.json#formdata json object receive
     number_of_qs = data["questionCount"] or 1
-    if(CreateAssignment.validate_on_submit()):
+    if(assign_form.validate_on_submit()):
         #access the question count field
         number_of_questions = 3
         #generate count many questions into a dictionary
@@ -73,9 +82,9 @@ def submit_answers():
         student_id = submit_form.student_id.data
         answers = {}
         index = 0
-        for answer_tag in submit_form.answers.values():
-            answers[f"{++index}"] = answer_tag.data
-            feedback[f"{i}"] = (check_answer(answers[i]))
+        for answer_tag in submit_form.answers.data:
+            answers[f"{++index}"] = submit_form.answer_tag
+            feedback[f"{i}"] = check_answer(submit_form.answer_tag)
             #answers_json = jsonify(answers)
             #feedback_json = jsonify(feedback)
             #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)

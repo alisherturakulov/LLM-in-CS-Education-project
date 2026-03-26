@@ -7,6 +7,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
+{# access these from the db  or render_template params#}
 <a href="./{{instructor_id}}/{{assignment_id}}">Link to assignment</a>
 <div id="qrCode">
   {{qrCode}}
