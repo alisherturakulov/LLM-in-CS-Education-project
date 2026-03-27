@@ -299,29 +299,34 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
   return log 
 
 #use pipeline from notebook
-def generate_questions(number_of_questions: int):
+def generate_questions(number_of_questions: int, questions=None):
     question = "what are the first 5 fibonacci numbers starting with a 0th term 0 and 1st term of 1?"
     answer = "the first 5 numbers are: 0, 1, 1, 2, 3"
     model_generate = "gpt-5-mini"
     model_examine = "gpt-5-mini"
-    log = pipline2(question, answer, model_generate, model_examine)
-    questions = {
+    questions = {}#to store questions
+    log = pipeline2(question, answer, model_generate, model_examine)
+    for error_class_idx in range(1, 6):
+      questions[str(error_class_idx)] = log[str(error_class_idx)]['final output']
+
+    if not questions:
+      questions = {
         "1": {
-            question:"",
-            generated_answer:"",
-            error_expected: int,
+          question:"",
+          generated_answer:"",
+          error_expected: int,
         },
         "2":{
-            question:"",
-            generated_answer:"",
-            error_expected: int,
+          question:"",
+          generated_answer:"",
+          error_expected: int,
         },
         "2":{
-            question:"",
-            generated_answer:"",
-            error_expected: int,
+          question:"",
+          generated_answer:"",
+          error_expected: int,
         },
-    }
+      }
     return questions
     #return pipline2(question, answer, model_generate, model_examine)
 
@@ -343,4 +348,5 @@ def check_answers(answers):
 # //host app
 #  if __name__ == 'main':
 #      app.run(debug=True)
-    
+
+print(generate_questions(3))
