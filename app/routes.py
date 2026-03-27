@@ -40,31 +40,32 @@ def create_questions():
         #access the question count field
         number_of_questions = assign_form.number_of_questions.data;
         #generate count many questions into a dictionary
-        # questions = generate_questions(count)
+        questions = generate_questions(count)
         #pass dicitonary object into template
         #get questions from pipline
         # questions = generate_questions(number_of_qs)
         #sample questions dictionary 
-        questions = {
-            "1": {
-                question:"question",
-                generated_erranswer:"answer",
-                error_expected: int,
-            },
-            "2":{
-                question:"question",
-                generated_erranswer:"answer",
-                error_expected: int,
-            },
-            "2":{
-                question:"question",
-                generated_erranswer:"answer",
-                error_expected: int,
-            },
-        }
+        # questions = {
+        #     "1": {
+        #         question:"question",
+        #         generated_erranswer:"answer",
+        #         error_expected: int,
+        #     },
+        #     "2":{
+        #         question:"question",
+        #         generated_erranswer:"answer",
+        #         error_expected: int,
+        #     },
+        #     "2":{
+        #         question:"question",
+        #         generated_erranswer:"answer",
+        #         error_expected: int,
+        #     },
+        # }
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
-        return render_template("index.html", questions=questions)
+        submit_form = Submit()
+        return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit.answers))
         #return redirect("index.html") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
@@ -80,18 +81,17 @@ def submit_answers():
     if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
-        answers = {}
         index = 0
         for answer_tag in submit_form.answers.data:
-            answers[f"{++index}"] = submit_form.answer_tag
-            feedback[f"{i}"] = check_answer(submit_form.answer_tag)
+            answers[f"{++index}"] = submit_form.answer_tag.data
+            feedback[f"{i}"] = check_answer(submit_form.answer_tag.data)
             #answers_json = jsonify(answers)
             #feedback_json = jsonify(feedback)
             #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
             return "Successfully submitted!"
         #feedback = check_answers(answers)
         #add to intructor's respective assignment submissions column as table
-    return "error with submission"
+    return "Error with submission"
     # data = request.json
     # answers = data.get('errorAnswers','')
 

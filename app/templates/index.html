@@ -9,15 +9,17 @@
             If multiple questions are received in json form from server,
             each h3 will have a number ordered by the index of the question
             -->
-            {{questions.hidden_tag()}}
+            
+            {{ submit.hidden_tag() }}
             {# Use a loop to go through the FieldList #}
-            {% for question_index in questions.keys %}
-                {{question_index+1}}
-                {{questions[question_index].label}}
-                {{questions[question_index]()}}
+            {% for (key, question), (answerfield) in questions %}
+                <p class="number">{{int(key)+1}}</p>
+                <p class="question">{{question}}</p>
+                {{ answerfield.label }}
+                {{ answerfield() }}
             {% endfor %}
-                {{questions.submit.label}}
-                {{questions.submit()}}
+            {{ submit.submit.label }}
+            {{ submit.submit() }}
             <!-- <div class="question">
                 <h3>Question</h3>
                 <p class="question">

@@ -82,6 +82,7 @@ def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effo
     )
   return completion
 
+###################text instructions
 system_prompt_generate1 = """You are a helpful, precise, and reasoning-focused AI assistant. You are collaborating with another agent who is designed to simulate student-like mistakes. This agent can generate erroneous answers to a given math question, where each answer demonstrates a specific type of common student error. There are five defined error types: Mental Typo, Knowledge Gap, Misconception, Wrong Choice, and Structural Blindness.
 
 Your task is to learn from this agent and produce answers with intentional, labeled errors that clearly correspond to these categories. Each answer should reflect one specific error type only.
@@ -305,26 +306,32 @@ def generate_questions(number_of_questions: int, questions=None):
     model_generate = "gpt-5-mini"
     model_examine = "gpt-5-mini"
     questions = {}#to store questions
-    log = pipeline2(question, answer, model_generate, model_examine)
-    for error_class_idx in range(1, 6):
-      questions[str(error_class_idx)] = log[str(error_class_idx)]['final output']
+    try:
+      log = pipeline2(question, answer, model_generate, model_examine)
+      for error_class_idx in range(1, 6):
+        questions[str(error_class_idx)] = log[str(error_class_idx)]['final output']
 
+    except Exception as e:
+      print(e)
+      questions = None
+    
+    
     if not questions:
       questions = {
         "1": {
-          question:"",
-          generated_answer:"",
-          error_expected: int,
+          "question":"placeholder",
+          "generated_answer":"",
+          "error_expected": int,
         },
         "2":{
-          question:"",
-          generated_answer:"",
-          error_expected: int,
+          "question":"placeholder",
+          "generated_answer":"",
+          "error_expected": int,
         },
         "2":{
-          question:"",
-          generated_answer:"",
-          error_expected: int,
+          "question":"placeholder",
+          "generated_answer":"",
+          "error_expected": int,
         },
       }
     return questions
@@ -349,4 +356,5 @@ def check_answers(answers):
 #  if __name__ == 'main':
 #      app.run(debug=True)
 
-print(generate_questions(3))
+#test print
+#print(generate_questions(3))
