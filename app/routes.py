@@ -20,18 +20,17 @@ def home():
             password= login_form.password.data
             remember_me = login_form.remember_me.data
             #in db match password hashed with the stored password hash under instructor_id with this username
-            return redirect('/assign')
         if(signup_form.validate_on_submit()):
             username = signup_form.username.data
             password = signup_form.password.data
             #make sure username's not a duplicate
             #store in db under new userid
-            return redirect("/assign")
+        return redirect("/assign")
     
     return render_template('login.html', login_form=login_form, signup_form=signup_form)
 
 
-@app.route('/assign', methods=['POST'])
+@app.route('/assign', methods=['GET','POST'])
 def create_questions():
     assign_form = CreateAssignment()
     #data = request.data.json#formdata json object receive
