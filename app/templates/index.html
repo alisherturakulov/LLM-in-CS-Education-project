@@ -13,8 +13,8 @@
             {{ submit.hidden_tag() }}
             {# Use a loop to go through the FieldList #}
             {% for (key, question), (answerfield) in questions %}
-                <p class="number">{{int(key)+1}}</p>
-                <p class="question">{{question}}</p>
+                <p class="number">{{key}}</p>
+                <p class="question">{{question["question"]}}</p>
                 {{ answerfield.label }}
                 {{ answerfield() }}
             {% endfor %}

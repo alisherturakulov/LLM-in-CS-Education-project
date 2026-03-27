@@ -40,7 +40,7 @@ def create_questions():
         #access the question count field
         number_of_questions = assign_form.number_of_questions.data;
         #generate count many questions into a dictionary
-        questions = generate_questions(count)
+        questions = generate_questions(number_of_questions)
         #pass dicitonary object into template
         #get questions from pipline
         # questions = generate_questions(number_of_qs)
@@ -65,7 +65,7 @@ def create_questions():
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         submit_form = Submit()
-        return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit.answers))
+        return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
         #return redirect("index.html") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
