@@ -26,6 +26,6 @@ class CreateAssignment(FlaskForm):
 class Submit(FlaskForm):
     student_name = StringField("Student Name", validators=[DataRequired()])
     student_id = StringField("Student ID", validators=[DataRequired()])
-    answers = FieldList(StringField("Answer"), min_entries=1)
+    answers = FieldList(StringField("Answer", validators=[DataRequired()]), min_entries=1)
     submit = SubmitField("Submit Assignment")
 

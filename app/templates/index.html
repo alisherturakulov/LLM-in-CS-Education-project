@@ -11,12 +11,21 @@
             -->
             
             {{ submit.hidden_tag() }}
+            <h2>Assignment</h2>
             {# Use a loop to go through the FieldList #}
+           
             {% for (key, question), (answerfield) in questions %}
                 <p class="number">{{key}}</p>
-                <p class="question">{{question["question"]}}</p>
+                <p class="question">{{question}}</p>
                 {{ answerfield.label }}
                 {{ answerfield() }}
+                {% if answerfield.errors %}
+                    <ul>
+                        {% for error in answerfield.errors %}
+                            <li style="color:red;">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             {% endfor %}
             {{ submit.submit.label }}
             {{ submit.submit() }}

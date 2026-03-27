@@ -305,35 +305,38 @@ def generate_questions(number_of_questions: int, questions=None):
     answer = "the first 5 numbers are: 0, 1, 1, 2, 3"
     model_generate = "gpt-5-mini"
     model_examine = "gpt-5-mini"
-    placeholder_question = { "1": {
+    placeholder_question = {
       "question":"placeholder question",
       "Answer With Error":"This is an erroneous answer",
       "error_class": int,
-      }
     }
     
+    
     questions = {}#to store questions
+    index = 1
+    index_str = str(index)
     try:
-      pipeline_log = pipline2(question, answer, model_generate, model_examine)
+      pipeline_log = pipeline2(question, answer, model_generate, model_examine)
       final_output = pipeline_log['final output']
-      questions.append(final_output)
+      questions[index_str] = final_output
     except Exception as e:
       print("Error:\n")
       print(e)
-      questions.append(placeholder_question)
+      questions[index_str] = placeholder_question["question"]
 
     if not questions:
       for i in range(1, number_of_questions):
+        index_str = str(i)
         try:
-          pipeline_log = pipline2(question, answer, model_generate, model_examine)
+          pipeline_log = pipeline2(question, answer, model_generate, model_examine)
           final_output = pipeline_log['final output']
-          questions.append(final_output)
+          questions[index_str] = final_output
         except Exception as e:
           print("Error:\n")
           print(e)
-          questions.append(placeholder_question)
+          questions[index_str] = placeholder_question["question"]
     return questions
-    #return pipline2(question, answer, model_generate, model_examine)
+    #return pipeline2(question, answer, model_generate, model_examine)
 
 #check a given answer against the question and error type expected in the answer
 def check_answer(question_and_sample_answer: str, answer: str, expected_error_type: str):

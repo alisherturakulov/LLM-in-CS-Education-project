@@ -5,7 +5,15 @@ from app.pipeline import check_answer, pipeline2, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
 #import db from module where initialized 
 
+assignments = {
 
+}
+idx = 0
+# assignment = {idx : {
+#     "question":"",
+#     "expected_error":"",
+#     "id":"",
+# }}
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -64,8 +72,10 @@ def create_questions():
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         submit_form = Submit()
-        return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
-        #return redirect("index.html") #will access instructors db to allow sharing of some assignment
+        idx+=1
+        assignments[str(idx)]
+        # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
+        return redirect("index.html") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
 
@@ -81,18 +91,28 @@ def submit_answers():
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
         index = 0
-        for answer_tag in submit_form.answers.data:
-            answers[f"{index++}"] = submit_form.answer_tag.data
-            feedback[f"{index}"] = check_answer(submit_form.answer_tag.data)
+        #add to intructor's respective assignment submissions column as table
+        #retrieve assignment index from redirect url, 
+        for answer_tag in submit_form.answers:
+            index += 1
+            index_str = str(index)
+            answers[index_str] = submit_form.answer_tag.data
+            feedback[index_str] = check_answer(submit_form.answer_tag.data)
             #answers_json = jsonify(answers)
             #feedback_json = jsonify(feedback)
             #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
             return "Successfully submitted!"
         #feedback = check_answers(answers)
-        #add to intructor's respective assignment submissions column as table
-    return "Error with submission"
+        
+    submit = Submit()
+    return render_template("index.html", submit=submit, questions=zip(assignment["questions"].items(), submit.answers))
+
+    # return "Error with submission"
     # data = request.json
     # answers = data.get('errorAnswers','')
 
-    
+
+@app.route("/share/<assignment_id>")
+def share(assignment_id):
+    assignment = assignments[str(assignment_id)]
 
