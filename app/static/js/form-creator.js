@@ -4,6 +4,10 @@
 
 //object holds assignment objects
 const assignments = {};
+// window.onload(()=>{
+    
+// });
+// const number_of_questions = 
 //= { firstAssignment:{}, secondAssignment{}, ...}
 
 //assignment object 
@@ -13,6 +17,18 @@ const assignments = {};
 // answer:"string", 
 // media:"path/to/media in /media or database location"
 //}
+/**
+ * 
+ * @param {Integer} count
+ */
+async function generate_questions(count){
+    const question_data = await fetch("./assign", {
+        method:"GET",
+    }
+    );
+    const questions = question_data.questions;
+    return questions;
+}
 
 /**
  * generates the current assignment and saves into the database
@@ -27,8 +43,16 @@ function generateAssignment(credentials, title){
  * loads saved assingments from data folder/database into current assignment viewer
  * @param {object} credentials credential obj if from a database; for accessing
  */
-function loadAssignment(credentials, title){
-
+async function loadAssignment(count, credentials=undefined){
+    const questions = await generate_questions(count);
+    const form = document.querySelector("#assignment");
+    for(let i =0; i<questions.size(); ++i){
+        const question = document.createElement("p");
+        question.className = "question";
+        question.textContent = questions[i].question;
+        form.appendChild(question);
+    }
+    
 }
 
 /**
