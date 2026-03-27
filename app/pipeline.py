@@ -301,39 +301,37 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
 
 #use pipeline from notebook
 def generate_questions(number_of_questions: int, questions=None):
-    question = "what are the first 5 fibonacci numbers starting with a 0th term 0 and 1st term of 1?"
+    question_ask = "what are the first 5 fibonacci numbers starting with a 0th term 0 and 1st term of 1?"
     answer = "the first 5 numbers are: 0, 1, 1, 2, 3"
     model_generate = "gpt-5-mini"
     model_examine = "gpt-5-mini"
+    placeholder_question = { "1": {
+      "question":"placeholder question",
+      "Answer With Error":"This is an erroneous answer",
+      "error_class": int,
+      }
+    }
+    
     questions = {}#to store questions
     try:
-      log = pipeline2(question, answer, model_generate, model_examine)
-      for error_class_idx in range(1, 6):
-        questions[str(error_class_idx)] = log[str(error_class_idx)]['final output']
-
+      pipeline_log = pipline2(question, answer, model_generate, model_examine)
+      final_output = pipeline_log['final output']
+      questions.append(final_output)
     except Exception as e:
+      print("Error:\n")
       print(e)
-      questions = None
-    
-    
+      questions.append(placeholder_question)
+
     if not questions:
-      questions = {
-        "1": {
-          "question":"placeholder",
-          "generated_answer":"",
-          "error_expected": int,
-        },
-        "2":{
-          "question":"placeholder",
-          "generated_answer":"",
-          "error_expected": int,
-        },
-        "2":{
-          "question":"placeholder",
-          "generated_answer":"",
-          "error_expected": int,
-        },
-      }
+      for i in range(1, number_of_questions):
+        try:
+          pipeline_log = pipline2(question, answer, model_generate, model_examine)
+          final_output = pipeline_log['final output']
+          questions.append(final_output)
+        except Exception as e:
+          print("Error:\n")
+          print(e)
+          questions.append(placeholder_question)
     return questions
     #return pipline2(question, answer, model_generate, model_examine)
 

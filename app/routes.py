@@ -82,8 +82,8 @@ def submit_answers():
         student_id = submit_form.student_id.data
         index = 0
         for answer_tag in submit_form.answers.data:
-            answers[f"{++index}"] = submit_form.answer_tag.data
-            feedback[f"{i}"] = check_answer(submit_form.answer_tag.data)
+            answers[f"{index++}"] = submit_form.answer_tag.data
+            feedback[f"{index}"] = check_answer(submit_form.answer_tag.data)
             #answers_json = jsonify(answers)
             #feedback_json = jsonify(feedback)
             #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
