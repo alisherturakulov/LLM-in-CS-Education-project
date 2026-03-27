@@ -1,7 +1,7 @@
 #routing for flask project
 from app import app
 from flask import render_template, request, redirect, jsonify
-from pipeline import check_answer, pipeline2
+from app.pipeline import check_answer, pipeline2, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
 #import db from module where initialized 
 
@@ -31,37 +31,37 @@ def home():
     return render_template('login.html', login_form=login_form, signup_form=signup_form)
 
 
-@app.route('/assign', methods=['GET'])
+@app.route('/assign', methods=['POST'])
 def create_questions():
     assign_form = CreateAssignment()
-    data = request.data.json#formdata json object receive
-    number_of_qs = data["questionCount"] or 1
+    #data = request.data.json#formdata json object receive
+    #number_of_qs = data["questionCount"] or 1
     if(assign_form.validate_on_submit()):
         #access the question count field
-        number_of_questions = 3
+        number_of_questions = assign_form.number_of_questions.data;
         #generate count many questions into a dictionary
-        questions = generate_questions(count)
+        # questions = generate_questions(count)
         #pass dicitonary object into template
         #get questions from pipline
-        questions = generate_questions(number_of_qs)
+        # questions = generate_questions(number_of_qs)
         #sample questions dictionary 
-        #questions = {
-        #     "1": {
-        #         question:"",
-        #         generated_answer:"",
-        #         error_expected: int,
-        #     },
-        #     "2":{
-        #         question:"",
-        #         generated_answer:"",
-        #         error_expected: int,
-        #     },
-        #     "2":{
-        #         question:"",
-        #         generated_answer:"",
-        #         error_expected: int,
-        #     },
-        # }
+        questions = {
+            "1": {
+                question:"question",
+                generated_erranswer:"answer",
+                error_expected: int,
+            },
+            "2":{
+                question:"question",
+                generated_erranswer:"answer",
+                error_expected: int,
+            },
+            "2":{
+                question:"question",
+                generated_erranswer:"answer",
+                error_expected: int,
+            },
+        }
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         return render_template("index.html", questions=questions)

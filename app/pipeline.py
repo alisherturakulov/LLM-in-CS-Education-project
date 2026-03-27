@@ -300,13 +300,11 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
 
 #use pipeline from notebook
 def generate_questions(number_of_questions: int):
-    # if(openAI.agent.is){
-
-    # }
-    question = ""
-    answer = ""
-    model_generate = ""
-    model_examine = ""
+    question = "what are the first 5 fibonacci numbers starting with a 0th term 0 and 1st term of 1?"
+    answer = "the first 5 numbers are: 0, 1, 1, 2, 3"
+    model_generate = "gpt-5-mini"
+    model_examine = "gpt-5-mini"
+    log = pipline2(question, answer, model_generate, model_examine)
     questions = {
         "1": {
             question:"",
