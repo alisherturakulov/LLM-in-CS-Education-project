@@ -1,6 +1,6 @@
 from app import app
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, BooleanField, SubmitField, FieldList
+from wtforms import StringField, PasswordField, IntegerField, BooleanField, SubmitField, FieldList, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
 
 #for logging in
@@ -19,8 +19,15 @@ class Signup(FlaskForm):
 
 #assignment creation
 class CreateAssignment(FlaskForm):
-    number_of_questions = IntegerField("Number of Questions", validators=[DataRequired()])
+    number_of_questions = SelectField("Number of Questions", validators=[DataRequired()])
+    questions = FieldList(QuestionForm("Question", validators=[DataRequired()]))
     submit = SubmitField("Create Assignment")
+class QuestionForm(FlaskForm):
+    class Meta:
+        csrf = False#csrf will be handled in parent form
+    question = StringField("Question Text", validators=[DataRequired()])
+    error_type = SelectMultipleField("Error Type", selection=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
+
 
 #assignment submission
 class Submit(FlaskForm):
