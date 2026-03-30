@@ -300,42 +300,56 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
   return log 
 
 #use pipeline from notebook
-def generate_questions(number_of_questions: int, questions=None):
-    question_ask = "what are the first 5 fibonacci numbers starting with a 0th term 0 and 1st term of 1?"
-    answer = "the first 5 numbers are: 0, 1, 1, 2, 3"
-    model_generate = "gpt-5-mini"
-    model_examine = "gpt-5-mini"
-    placeholder_question = {
+def generate_questions(questions_data=None):
+  answer=""#generate correct solution
+  if(not questions_data):
+    question_element = {
       "question":"placeholder question",
-      "Answer With Error":"This is an erroneous answer",
-      "error_class": int,
+      "error answers":["This is an erroneous answer"],
+      "error classes": ["0"],
     }
-    
-    
-    questions = {}#to store questions
-    index = 1
-    index_str = str(index)
-    try:
-      pipeline_log = pipeline2(question, answer, model_generate, model_examine)
-      final_output = pipeline_log['final output']
-      questions[index_str] = final_output
-    except Exception as e:
+    questions_data = {"question":"placeholder q", "error_type":"0"}
+    return {question_element}
+  
+  model_generate = "gpt-5-mini"
+  model_examine = "gpt-5-mini"
+  
+  
+
+  # question_element["question"] = questions_data["question"]
+  # question_element["error class"] = questions_data["error_type"]
+  
+  #holds question_element objects with erroneous solutions generated
+  generated_error_questions = []
+
+  for(question_field_dict in questions_data): 
+    #frame for each entry in generated_error_questions
+    question_element = {
+      "question":"",
+      "error answers": [],
+      "error classes": [],
+    }
+    current_question = question_field_dict["question"]
+    answer="generate correct answer"#maybe generate correct answer
+    error_classes = question_field_dict["error_types"]
+    question_element["question"] = current_question
+
+    try:#incase api error
+      pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
+      generated_erroneous_solutions = [(pipeline_log[error_class]['final output']) for error_class in error_classes]
+      question_element["error answers"] = generated_erroneous_solutions
+      question_element["error classes"] = error_classes
+      generated_error_questions.append(question_element)
+    except Exception as e:#add a placeholder element
       print("Error:\n")
       print(e)
-      questions[index_str] = placeholder_question["question"]
-
-    if not questions:
-      for i in range(1, number_of_questions):
-        index_str = str(i)
-        try:
-          pipeline_log = pipeline2(question, answer, model_generate, model_examine)
-          final_output = pipeline_log['final output']
-          questions[index_str] = final_output
-        except Exception as e:
-          print("Error:\n")
-          print(e)
-          questions[index_str] = placeholder_question["question"]
-    return questions
+      question_element = {
+        "question":"placeholder question",
+        "error answers":["This is an erroneous answer"],
+        "error classes": ["0"],
+      }
+      generated_error_questions.append(question_element)
+  return generated_error_questions
     #return pipeline2(question, answer, model_generate, model_examine)
 
 #check a given answer against the question and error type expected in the answer

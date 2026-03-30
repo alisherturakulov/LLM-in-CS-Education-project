@@ -73,7 +73,7 @@
                 //listen for when number input loses focus
                 number_of_q_selection.addEventListener("change", () => {
                     const question_fields =document.querySelectorAll(".questionFieldDiv");
-                    firstQuestion = question_fields[0];
+                    const firstQuestion = question_fields[0];
                    
                     const num_questions = number_of_q_selection.value;
                     if(question_fields.length > num_questions){
@@ -85,9 +85,8 @@
                             }
                         }
                     }else{
-                        
+                        const lastQuestion = question_fields[question_fields.length-1];
                         for(let i = question_fields.length; i < num_questions; ++i){
-                            const lastQuestion = question_fields[question_fields.length-1];
                             const cloneQ = lastQuestion.cloneNode(true);
                             wrapper.appendChild(cloneQ);
                         }

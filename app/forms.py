@@ -26,7 +26,7 @@ class QuestionForm(FlaskForm):
     class Meta:
         csrf = False#csrf will be handled in parent form
     question = StringField("Question Text", validators=[DataRequired()])#error class numbers based on pipeline2 string 'system_prompt_generate1'
-    error_type = SelectMultipleField("Error Type", selection=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
+    error_types = SelectMultipleField("Error Type", selection=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
 
 
 #assignment submission
