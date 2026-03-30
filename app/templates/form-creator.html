@@ -24,8 +24,21 @@
         <form id="assignment" action="" method="post">
             <p>Create Assignment</p>
             {{form.hidden_tag()}}
+
             {{form.number_of_questions.label}}
             {{form.number_of_questions()}}
+
+            {{% for question in form.questions %}}
+                <div class="questionFieldDiv">
+                    
+                    {{ question.question.label }}
+                    {{ question.question() }}
+
+                    {{ question.error_type.label }}
+                    {{ quesiton.error_type() }}
+                </div>
+            {{% endfor %}}
+            
             {{form.submit.label}}
             {{form.submit()}}
             <!-- 
@@ -52,4 +65,24 @@
             </button> 
             -->
         </form>
+        <script>
+            //listens and updates based on the number of questions selection field 
+            const number_of_q_selection = wrapper.querySelector("input#num_questions");
+            //listen for when number input loses focus
+            number_of_q_selection.addEventListener("change", () => {
+                const question_field =document.querySelectorAll(".questionFieldDiv");
+                const wrapper = document.querySelector("#assignment");
+                const firstQuestion = wrapper.firstChild();
+                
+                
+                let num_questions = number_of_q_selection.value;
+                for(let i = 0; i < num_questions; ++i){
+                    const lastQuestion = wrapper.lastChild();
+                    const cloneQ = lastQuestion.cloneNode(true);
+                    wrapper.appendChild(cloneQ);
+                }
+            })
+            
+
+        </script>
     {% endblock %}
