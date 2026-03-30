@@ -38,7 +38,7 @@
                     {{ quesiton.error_type() }}
                 </div>
             {{% endfor %}}
-            
+
             {{form.submit.label}}
             {{form.submit()}}
             <!-- 
@@ -67,21 +67,33 @@
         </form>
         <script>
             //listens and updates based on the number of questions selection field 
-            const number_of_q_selection = wrapper.querySelector("input#num_questions");
-            //listen for when number input loses focus
-            number_of_q_selection.addEventListener("change", () => {
-                const question_field =document.querySelectorAll(".questionFieldDiv");
+            document.addEventListener("DOMContentLoaded", () => {
                 const wrapper = document.querySelector("#assignment");
-                const firstQuestion = wrapper.firstChild();
-                
-                
-                let num_questions = number_of_q_selection.value;
-                for(let i = 0; i < num_questions; ++i){
-                    const lastQuestion = wrapper.lastChild();
-                    const cloneQ = lastQuestion.cloneNode(true);
-                    wrapper.appendChild(cloneQ);
-                }
-            })
+                const number_of_q_selection = wrapper.querySelector("input#num_questions");
+                //listen for when number input loses focus
+                number_of_q_selection.addEventListener("change", () => {
+                    const question_fields =document.querySelectorAll(".questionFieldDiv");
+                    firstQuestion = question_fields[0];
+                   
+                    const num_questions = number_of_q_selection.value;
+                    if(question_fields.length > num_questions){
+                        //remove extra question, left with num_questions count of qs
+                        const keep = prompt(`You have more than ${num_questions}, type 'yes' or 'y' to remove extra questions`);
+                        while(!keep.toLowerCase().includes("yes") && !keep.toLowerCase().includes("y")){
+                            for(let i = question_fields.length-1; i>=num_questions; --i){
+                                question_fields[i].remove();
+                            }
+                        }
+                    }else{
+                        
+                        for(let i = question_fields.length; i < num_questions; ++i){
+                            const lastQuestion = question_fields[question_fields.length-1];
+                            const cloneQ = lastQuestion.cloneNode(true);
+                            wrapper.appendChild(cloneQ);
+                        }
+                    }
+                });
+            });
             
 
         </script>
