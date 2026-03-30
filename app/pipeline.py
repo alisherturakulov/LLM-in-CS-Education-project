@@ -300,6 +300,7 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
   return log 
 
 #use pipeline from notebook
+#questions data a list of dicts
 def generate_questions(questions_data=None):
   answer=""#generate correct solution
   if(not questions_data):
@@ -322,7 +323,7 @@ def generate_questions(questions_data=None):
   #holds question_element objects with erroneous solutions generated
   generated_error_questions = []
 
-  for(question_field_dict in questions_data): 
+  for question_field_dict in questions_data: 
     #frame for each entry in generated_error_questions
     question_element = {
       "question":"",
@@ -358,13 +359,14 @@ def check_answer(question_and_sample_answer: str, answer: str, expected_error_ty
                     identifying the error in the sample answer to the question
                 """
   return "placeholder"
-
-def check_answers(answers):
+#assignment { q: "", expected_error_class: ""}
+def check_answers(answers, assignment):
   #need to access the db column of actual answers form when the problems were generated
   #then compare with the answer received using inputStr.indexOf(expectedStr.toLower())
   # for(answer in answers.values()):
-
-    check_answer()
+  
+    #check_answer()
+  return "placeholder correct"
 #flask routing
 
 # //host app

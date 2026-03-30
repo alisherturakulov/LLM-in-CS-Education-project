@@ -5,9 +5,9 @@ from app.pipeline import check_answer, pipeline2, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
 #import db from module where initialized 
 
-assignments = {
+#holds the question_generated obj to be used to generate the assignment fillout
+assignments = []
 
-}
 idx = 0
 # assignment = {idx : {
 #     "question":"",
@@ -45,11 +45,18 @@ def create_questions():
     #number_of_qs = data["questionCount"] or 1
     if(assign_form.validate_on_submit()):
         #access the question count field
-        number_of_questions = assign_form.number_of_questions.data;
-        #generate count many questions into a dictionary
-        questions = generate_questions(number_of_questions)
-        #pass dicitonary object into template
-        #get questions from pipline
+        #number_of_questions = assign_form.number_of_questions.data;
+        
+        #should be a dict of dictionaries containing questionfield var_name: value for question text and 1-6 total error classes chosen
+        questions_for_generating = assign_form.questions.data
+        
+        #shouls generate a list of dictionaries with
+        generated_error_questions = generate_questions(questions_for_generating)
+        
+        #to be accessed later in /submit-assignment
+        assignments.append(generated_error_questions)
+    
+        
         # questions = generate_questions(number_of_qs)
         #sample questions dictionary 
         # questions = {
@@ -72,10 +79,9 @@ def create_questions():
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         submit_form = Submit()
-        idx+=1
-        assignments[str(idx)]
+        
         # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
-        return redirect("index.html") #will access instructors db to allow sharing of some assignment
+        return redirect("/submit-assignment") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
 
@@ -86,17 +92,22 @@ def submit_answers():
         #"1":"",#commment out once db is setup
         } 
     submit_form = Submit()
+    #access latest created assignment from global object
     answers = {}
+    current_assignment_dict = assignments[len(assignments)-1]
+
     if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
         index = 0
         #add to intructor's respective assignment submissions column as table
         #retrieve assignment index from redirect url, 
+        expected = []# for each answer in order from assignment in global assignments list variable { q: "", expected_error_class: ""} 
         for answer_tag in submit_form.answers:
             index += 1
             index_str = str(index)
             answers[index_str] = submit_form.answer_tag.data
+            expected[index_str] = assig
             feedback[index_str] = check_answer(submit_form.answer_tag.data)
             #answers_json = jsonify(answers)
             #feedback_json = jsonify(feedback)
@@ -105,7 +116,7 @@ def submit_answers():
         #feedback = check_answers(answers)
         
     submit = Submit()
-    return render_template("index.html", submit=submit, questions=zip(assignment["questions"].items(), submit.answers))
+    return render_template("index.html", submit=submit, questions=zip(assignments[len(assignments)-1], submit.answers))
 
     # return "Error with submission"
     # data = request.json
