@@ -28,16 +28,14 @@
             {{form.number_of_questions.label}}
             {{form.number_of_questions()}}
 
-            {{% for question in form.questions %}}
+            {% for question in form.questions %}
                 <div class="questionFieldDiv">
                     
                     {{ question.question.label }}
                     {{ question.question() }}
 
-                    {{ question.error_type.label }}
-                    {{ quesiton.error_type() }}
                 </div>
-            {{% endfor %}}
+            {% endfor %}
 
             {{form.submit.label}}
             {{form.submit()}}
