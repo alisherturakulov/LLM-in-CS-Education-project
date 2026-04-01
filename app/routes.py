@@ -123,7 +123,7 @@ def submit_answers(assignment_id):
         #feedback = check_answers(answers)
         
     
-    return render_template("index.html", submit=submit_form, questions_pair=zip(assignments[assignment_id], submit_form.answers))
+    return render_template("index.html", submit=submit_form, questions_pair=list(zip(assignments[assignment_id], submit_form.answers)))
 
     # return "Error with submission"
     # data = request.json
