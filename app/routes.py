@@ -87,7 +87,7 @@ def create_questions():
     return render_template("form-creator.html", form=assign_form)
 
 
-@app.route('/submit-assignment/<int:assignment_id>', methods=['POST'])
+@app.route('/submit-assignment/<int:assignment_id>', methods=['GET','POST'])
 def submit_answers(assignment_id):
     feedback = {
         #in the same order as the answers were received
@@ -95,30 +95,35 @@ def submit_answers(assignment_id):
         } 
     submit_form = Submit()
     #access latest created assignment from global object
-    answers = {}
-    current_assignment_dict = assignments[len(assignments)-1]
+    results = []
+    current_assignment_dict = assignments[assignment_id]
 
     if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
-        index = 0
+        answers = submit_form.answers.data
+        answerIndex = 0
         #add to intructor's respective assignment submissions column as table
         #retrieve assignment index from redirect url, 
-        expected = []# for each answer in order from assignment in global assignments list variable { q: "", expected_error_class: ""} 
-        for answer_tag in submit_form.answers:
-            index += 1
-            index_str = str(index)
-            answers[index_str] = submit_form.answer_tag.data
-            expected[index_str] = assig
-            feedback[index_str] = check_answer(submit_form.answer_tag.data)
-            #answers_json = jsonify(answers)
-            #feedback_json = jsonify(feedback)
-            #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
-            return "Successfully submitted!"
+        #expected = []# for each answer in order from assignment in global assignments list variable { q: "", expected_error_class: ""} 
+        #check each corresponding answer with expected error
+
+        for question_element in current_assignment_dict:
+            for i in range(len(question_element["error classes"])):
+                
+                # index_str = str(index)
+                # answers.append(submit_form.answer_tag.data)
+                # expected[index_str] = assignments[assignment_id][error_classes]
+                # feedback[index_str] = check_answer(submit_form.answer_tag.data)
+                answerIndex += 1
+                #answers_json = jsonify(answers)
+                #feedback_json = jsonify(feedback)
+                #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
+        return render_template_string(f"Successfully submitted!\nResults:\n{answers}");
         #feedback = check_answers(answers)
         
     
-    return render_template("index.html", submit=submit_form, questions=zip(assignments[len(assignments)-1], submit.answers))
+    return render_template("index.html", submit=submit_form, questions_pair=zip(assignments[assignment_id], submit_form.answers))
 
     # return "Error with submission"
     # data = request.json

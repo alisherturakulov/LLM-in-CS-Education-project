@@ -33,7 +33,7 @@
                 {% for errorIndex in range(len(assignment["error classes"])) %}
                     
                     {# since the second (index 1) value in the pair is the answer #}
-                    {{% set answerfield = questions_pair[answerIndex][1] %}}
+                    {% set answerfield = questions_pair[answerIndex][1] %}
                     <p class="erroneousAnswer">
                         assignment["error answers"][errorIndex]
                     </p>
