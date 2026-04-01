@@ -33,7 +33,9 @@
                     
                     {{ question.question.label }}
                     {{ question.question() }}
-
+                    {{ question.error_types.label }}
+                    {{ question.error_types() }}
+                    
                 </div>
             {% endfor %}
 

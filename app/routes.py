@@ -52,10 +52,10 @@ def create_questions():
         
         #shouls generate a list of dictionaries with
         generated_error_questions = generate_questions(questions_for_generating)
-        
+        print("Generated_error_questions:\n"+ f"{generated_error_questions}")
         #to be accessed later in /submit-assignment
         assignments.append(generated_error_questions)
-    
+        
         
         # questions = generate_questions(number_of_qs)
         #sample questions dictionary 
@@ -115,8 +115,8 @@ def submit_answers():
             return "Successfully submitted!"
         #feedback = check_answers(answers)
         
-    submit = Submit()
-    return render_template("index.html", submit=submit, questions=zip(assignments[len(assignments)-1], submit.answers))
+    
+    return render_template("index.html", submit=submit_form, questions=zip(assignments[len(assignments)-1], submit.answers))
 
     # return "Error with submission"
     # data = request.json
@@ -126,4 +126,6 @@ def submit_answers():
 @app.route("/share/<assignment_id>")
 def share(assignment_id):
     assignment = assignments[str(assignment_id)]
+
+
 
