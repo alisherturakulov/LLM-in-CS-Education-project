@@ -4,6 +4,16 @@
         <!-- <button type="button" onclick="loadQuestions()">
             Load Quesitons
         </button> -->
+
+        <h3>Possible Error Types</h2>
+        <ol start="0">
+            <li>'Mental Typo'</li>
+            <li>'Knowledge Gap'</li>
+            <li>'Misconception'</li>
+            <li>'Wrong Choice'</li>
+            <li>'Structural Blindness'</li>
+        </ol>
+        <h1>Assignment</h1>
         <form class="assignment" action="" method="post">
             <!--
             If multiple questions are received in json form from server,
@@ -11,21 +21,35 @@
             -->
             
             {{ submit.hidden_tag() }}
-            <h2>Assignment</h2>
+            
             {# Use a loop to go through the FieldList #}
-           
-            {% for (key, question), (answerfield) in questions %}
-                <p class="number">{{key}}</p>
-                <p class="question">{{question}}</p>
-                {{ answerfield.label }}
-                {{ answerfield() }}
-                {% if answerfield.errors %}
-                    <ul>
-                        {% for error in answerfield.errors %}
-                            <li style="color:red;">{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+            {% set answerIndex = 0 %}
+            {# for each assignment, pair each error answer with an answerfield where both should have the same number of elements to match up#}
+            {% for (assignment), (answerfield_notused) in questions_pair %}
+                <h3 class="answerIndex">Question {{answerIndex}}</h3>
+                <p class="question">{{assignment["question"]}}</p>
+                <p>Identify the error in the solution(s) below:</p>
+        
+                {% for errorIndex in range(len(assignment["error classes"])) %}
+                    
+                    {# since the second (index 1) value in the pair is the answer #}
+                    {{% set answerfield = questions_pair[answerIndex][1] %}}
+                    <p class="erroneousAnswer">
+                        assignment["error answers"][errorIndex]
+                    </p>
+                    {{ answerfield.label }}
+                    {{ answerfield() }}
+
+                    {% set answerIndex = answerIndex + 1 %}
+                    {# errorIndex will be part of loop#}
+                    {% if answerfield.errors %}
+                        <ul>
+                            {% for error in answerfield.errors %}
+                                <li style="color:red;">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
             {{ submit.submit.label }}
             {{ submit.submit() }}
