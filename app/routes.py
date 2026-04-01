@@ -7,6 +7,8 @@ from app.forms import Login, Signup, CreateAssignment, Submit
 
 #holds the question_generated obj to be used to generate the assignment fillout
 assignments = []
+submissions = []
+#submission= {"student_name":"", "student_id":"", "answers":[]}
 
 idx = 0
 # assignment = {idx : {
@@ -123,9 +125,15 @@ def submit_answers():
     # answers = data.get('errorAnswers','')
 
 
-@app.route("/share/<assignment_id>")
-def share(assignment_id):
-    assignment = assignments[str(assignment_id)]
+@app.route("/share/<int:assignment_id>")
+def share(assignment_id):#index from assignments list
+    assignment = assignments[assignment_id]
 
 
-
+@app.route("/submissions/<int:assignment_id>")
+def submissions(assignment_id):
+    submissions = ""
+    for submission in submissions:
+        results+= str(submission)
+        results+= "\n"
+    return submissions;
