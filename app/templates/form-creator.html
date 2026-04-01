@@ -27,18 +27,18 @@
 
             {{form.number_of_questions.label}}
             {{form.number_of_questions()}}
-
-            {% for question in form.questions %}
-                <div class="questionFieldDiv">
+            <div class="questionFieldDiv"></div>
+                {% for question in form.questions %}
                     
-                    {{ question.question.label }}
-                    {{ question.question() }}
-                    {{ question.error_types.label }}
-                    {{ question.error_types() }}
+                    <div class="questionsContainer">
+                        {{ question.question.label }}
+                        {{ question.question() }}
+                        {{ question.error_types.label }}
+                        {{ question.error_types() }}
+                    </div>
                     
-                </div>
-            {% endfor %}
-
+                {% endfor %}
+            </div>
             {{form.submit.label}}
             {{form.submit()}}
             <!-- 
@@ -68,26 +68,45 @@
         <script>
             //listens and updates based on the number of questions selection field 
             document.addEventListener("DOMContentLoaded", () => {
-                const wrapper = document.querySelector("#assignment");
-                const number_of_q_selection = wrapper.querySelector("input#num_questions");
+                const wrapper = document.querySelector(".assignment");
+                const number_of_q_selection = document.querySelector("input#num_questions") || 10;
                 //listen for when number input loses focus
                 number_of_q_selection.addEventListener("change", () => {
-                    const question_fields =document.querySelectorAll(".questionFieldDiv");
+                    const question_fields =wrapper.querySelectorAll(".questionsContainer");
                     const firstQuestion = question_fields[0];
                    
-                    const num_questions = number_of_q_selection.value;
+                    const num_questions = number_of_q_selection.value || 1;//min entries = 1
                     if(question_fields.length > num_questions){
                         //remove extra question, left with num_questions count of qs
                         const keep = prompt(`You have more than ${num_questions}, type 'yes' or 'y' to remove extra questions`);
-                        while(!keep.toLowerCase().includes("yes") && !keep.toLowerCase().includes("y")){
+                        if(keep.toLowerCase().includes("yes") || keep.toLowerCase().includes("y")){
                             for(let i = question_fields.length-1; i>=num_questions; --i){
-                                question_fields[i].remove();
+                                question_fields[i].remove;
                             }
                         }
                     }else{
-                        const lastQuestion = question_fields[question_fields.length-1];
+                        //const lastQuestion = question_fields[question_fields.length-1];
                         for(let i = question_fields.length; i < num_questions; ++i){
-                            const cloneQ = lastQuestion.cloneNode(true);
+                            const cloneQ = firstQuestion.cloneNode(true);
+                           console.log(cloneQ.toString());
+                            // const inputs = cloneQ.querySelectorAll("input, select");
+                            // let name;
+                            // inputs.forEach((input) => {
+                            //     //get name
+            
+                            //     name = input.substring(input.name.lastIndexOf("-"));
+                            //     if (input.name) input.name = `questions-${i}${name}`;
+                            //     if (input.id) input.id = `questions-${i}${name}`;
+                            // });
+                            // const labels = cloneQ.querySelectorAll("label");
+                            // labels.forEach((label)=>{
+                            //     if(label.htmlFor) {
+                            //         label.htmlFor = `questions-${i}${name}`;
+                            //     }
+                            // });
+                            // if(input.type !== "submit" && input.type !== "button"){
+                            //     input.value = "";
+                            // }
                             wrapper.appendChild(cloneQ);
                         }
                     }
