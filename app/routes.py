@@ -51,10 +51,10 @@ def create_questions():
         
         #should be a dict of dictionaries containing questionfield var_name: value for question text and 1-6 total error classes chosen
         questions_for_generating = assign_form.questions.data
-        
+        print("questions_for_generating: " + str(assign_form.questions.data))
         #shouls generate a list of dictionaries with
         generated_error_questions = generate_questions(questions_for_generating)
-        print("Generated_error_questions:\n"+ f"{generated_error_questions}")
+        print("Generated_error_questions:\n"+ str(generated_error_questions))
         #to be accessed later in /submit-assignment
         assignments.append(generated_error_questions)
         
@@ -81,14 +81,14 @@ def create_questions():
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         submit_form = Submit()
-        
+        assignment_id = len(assignments) - 1
         # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
-        return redirect("/submit-assignment") #will access instructors db to allow sharing of some assignment
+        return redirect(f"/submit-assignment/{assignment_id}") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
 
-@app.route('/submit-assignment', methods=['POST'])
-def submit_answers():
+@app.route('/submit-assignment/<int:assignment_id>', methods=['POST'])
+def submit_answers(assignment_id):
     feedback = {
         #in the same order as the answers were received
         #"1":"",#commment out once db is setup
@@ -127,8 +127,8 @@ def submit_answers():
 
 @app.route("/share/<int:assignment_id>")
 def share(assignment_id):#index from assignments list
-    assignment = assignments[assignment_id]
-
+    #assignment = assignments[assignment_id]
+    return "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
 
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):
