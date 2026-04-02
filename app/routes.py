@@ -14,8 +14,8 @@ results = []
 idx = 0
 # assignment = {idx : {
 #     "question":"",
-#     "expected_error":"",
-#     "id":"",
+#     "error answers":[],
+#     "error classes":[],
 # }}
 
 @app.route('/', methods=['GET', 'POST'])
@@ -59,26 +59,8 @@ def create_questions():
         #to be accessed later in /submit-assignment
         assignments.append(generated_error_questions)
         
-        
         # questions = generate_questions(number_of_qs)
-        #sample questions dictionary 
-        # questions = {
-        #     "1": {
-        #         question:"question",
-        #         generated_erranswer:"answer",
-        #         error_expected: int,
-        #     },
-        #     "2":{
-        #         question:"question",
-        #         generated_erranswer:"answer",
-        #         error_expected: int,
-        #     },
-        #     "2":{
-        #         question:"question",
-        #         generated_erranswer:"answer",
-        #         error_expected: int,
-        #     },
-        # }
+        
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         
@@ -104,7 +86,7 @@ def submit_answers(assignment_id):
         #raise IndexError("Incorrect assignment_id")
         return render_template_string("Error code 500 incorrect assignment id")
     
-    if(request.method == "POST" and submit_form.validate_on_submit()):
+    if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
         answers = submit_form.answers.data
@@ -133,10 +115,28 @@ def submit_answers(assignment_id):
             print(f"question result:{result}")
         print('After adding assignment_results:')
         print(assignment_results)
-        return render_template_string(f"Successfully submitted!\nResults:\n{results}")
+        return render_template_string(f"Successfully submitted!\nResults:\n{assignment_results}")
         #feedback = check_answers(answers)
-    else:
-        return render_template("index.html", submit=submit_form, questions_pair=list(zip(assignments[assignment_id], submit_form.answers)))
+    #create a list of generated answers
+    
+    erroneous_solutions = []
+    corresponding_questions = []#list of str questions corresp. to their first erroroneous answer if "" dont print question
+    for assignment in current_assignment_dict:
+        for i  in range(len(assignment["error answers"])):
+            error_answer = assignment["error answers"][i]
+            if i == 0:
+                corresponding_questions.append(assignment["question"])
+            else: 
+                corresponding_questions.append("")
+            
+            erroneous_solutions.append(error_answer)
+            #answwers fieldlist should have length same as erroneous_solutions
+            submit_form.answers.append_entry("")
+    if len(submit_form.answers) != len(erroneous_solutions):
+        print(f"Error 500: lists of answerfields and erroneous solutions don't match: {len(submit_form.answers)} != {len(erroneous_solutions)}")
+        return render_template_string(f"Error 500: lists of answerfields and erroneous solutions don't match: {len(submit_form.answers)} != {len(erroneous_solutions)}")
+    
+    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_pair=zip(erroneous_solutions, submit_form.answers))
 
     # return "Error with submission"
     # data = request.json
@@ -152,7 +152,7 @@ def share(assignment_id):#index from assignments list
         #raise IndexError("Incorrect assignment_id")
         return render_template_string("Error code 500 incorrect assignment id")
     #assignment = assignments[assignment_id]
-    return "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
+    return render_template("share.html", qrcode ="NA", assignment_id= assignment_id) or "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
 
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):

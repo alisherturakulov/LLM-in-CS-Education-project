@@ -8,7 +8,8 @@
 
 {% block body %}
 {# access these from the db  or render_template params#}
-<a href="./{{instructor_id}}/{{assignment_id}}">Link to assignment</a>
+<h1>Link to assignment: </h1>
+<a href="./submit-assignment/{{assignment_id}}"><h3>./submit-assignment/{{assignment_id}}</h3></a>
 <div id="qrCode">
   {{qrCode}}
 </div>
