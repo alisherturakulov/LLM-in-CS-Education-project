@@ -26,32 +26,31 @@
             {% set answerIndex = 0 %}
             {# for each assignment, pair each error answer with an answerfield where both should have the same number of elements to match up#}
             
-            {% for (assignment), (answerfield_notused) in questions_pair %}
-                <h3 class="answerIndex">Question {{answerIndex}}</h3>
-                <p class="question">{{assignment["question"]}}</p>
+            {% for (erroneousAnswer), (answerfield) in questions_pair %}
+                
+                {% if corresponding_questions[answerIndex] != "" %}
+                     <h3 class="answerIndex">Question {{answerIndex}}</h3>
+                     <p class="question">{{ corresponding_questions[answerIndex] }}</p>
+                {% endif %}
+                   
                 <p>Identify the error in the solution(s) below:</p>
-                {% set errorIndex = 0 %}
-                {% for error_class in assignment["error classes"] %}
-                    
-                    {# since the second (index 1) value in the pair is the answer #}
+               
+                <p class="erroneousAnswer">
+                    {{ erroneousAnswer }}
+                </p>
+                {{ answerfield.label }}
+                {{ answerfield() }}
 
-                    {% set answerfield = questions_pair[answerIndex][1] %}
-                    <p class="erroneousAnswer">
-                        {{assignment["error answers"][errorIndex]}}
-                    </p>
-                    {{ answerfield.label }}
-                    {{ answerfield() }}
-
-                    {% set answerIndex = answerIndex + 1 %}
-                    {% set errorIndex = errorIndex + 1%}
-                    {% if answerfield.errors %}
-                        <ul>
-                            {% for error in answerfield.errors %}
-                                <li style="color:red;">{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endfor %}
+                {% set answerIndex = answerIndex + 1 %}
+                
+                {% if answerfield.errors %}
+                    <ul>
+                        {% for error in answerfield.errors %}
+                            <li style="color:red;">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+              
             {% endfor %}
             {{ submit.submit.label }}
             {{ submit.submit() }}
