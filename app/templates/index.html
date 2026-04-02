@@ -21,16 +21,20 @@
             -->
             
             {{ submit.hidden_tag() }}
-            
+            {{ submit.student_name.label}}
+            {{ submit.student_name()}}
+            {{ submit.student_id.label}}
+            {{ submit.student_id()}}
+
             {# Use a loop to go through the FieldList #}
-            {% set answerIndex = 0 %}
+
             {# for each assignment, pair each error answer with an answerfield where both should have the same number of elements to match up#}
             
             {% for (erroneousAnswer), (answerfield) in questions_pair %}
                 
-                {% if corresponding_questions[answerIndex] != "" %}
-                     <h3 class="answerIndex">Question {{answerIndex}}</h3>
-                     <p class="question">{{ corresponding_questions[answerIndex] }}</p>
+                {% if corresponding_questions[loop.index0] != "" %}
+                     <h3 class="questionNumber">Question {{loop.index}}</h3>
+                     <p class="question">{{ corresponding_questions[loop.index0] }}</p>
                 {% endif %}
                    
                 <p>Identify the error in the solution(s) below:</p>
@@ -41,7 +45,7 @@
                 {{ answerfield.label }}
                 {{ answerfield() }}
 
-                {% set answerIndex = answerIndex + 1 %}
+              
                 
                 {% if answerfield.errors %}
                     <ul>

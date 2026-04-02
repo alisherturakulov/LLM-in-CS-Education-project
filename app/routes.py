@@ -132,11 +132,11 @@ def submit_answers(assignment_id):
             erroneous_solutions.append(error_answer)
             #answwers fieldlist should have length same as erroneous_solutions
             submit_form.answers.append_entry("")
-    if len(submit_form.answers) != len(corresponding_questions):
+    # if len(submit_form.answers.entries) != len(corresponding_questions):
         
-        print(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers)} != {len(corresponding_questions)}")
-        print(f"{submit_form.answers}\n{corresponding_questions}")
-        return render_template_string(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers)} != {len(corresponding_questions)}\n{submit_form.answers}\n{corresponding_questions}")
+    #     print(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers.entries)} != {len(corresponding_questions)}")
+    #     print(f"{submit_form.answers.entries}\n{corresponding_questions}")
+    #     return render_template_string(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers.entries)} != {len(corresponding_questions)}\n{submit_form.answers.entries}\n{corresponding_questions}")
     
     return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_pair=zip(erroneous_solutions, submit_form.answers))
 
