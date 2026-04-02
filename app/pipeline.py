@@ -336,9 +336,9 @@ def generate_questions(questions_data=None):
     question_element["question"] = current_question
 
     try:#incase api error
-      pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
-      generated_erroneous_solutions = [(pipeline_log[error_class]['final output']) for error_class in error_classes]
-      question_element["error answers"] = generated_erroneous_solutions
+      #pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
+      generated_erroneous_solutions = None#[(pipeline_log[error_class]['final output']) for error_class in error_classes]
+      question_element["error answers"] = generated_erroneous_solutions or "generated solution goes here; uncomment pipeline call first"
       question_element["error classes"] = error_classes
       generated_error_questions.append(question_element)
     except Exception as e:#add a placeholder element
