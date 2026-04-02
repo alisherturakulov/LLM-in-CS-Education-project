@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 class Login(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
-    remember_me = BooleanField("Remember Me", validators=[DataRequired()])
+    remember_me = BooleanField("Remember Me")
     submit = SubmitField("Sign in")
 
 
@@ -24,7 +24,7 @@ class QuestionForm(FlaskForm):
     question = StringField("Question Text", validators=[DataRequired()])#error class numbers based on pipeline2 string 'system_prompt_generate1'
     error_types = SelectMultipleField("Error Type", validators=[DataRequired()], choices=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
 class CreateAssignment(FlaskForm):
-    number_of_questions = IntegerField("Number of Questions", validators=[DataRequired()], render_kw={"id":"num_questions"})
+    number_of_questions = IntegerField("Number of Questions", validators=[DataRequired()])
     questions = FieldList( FormField(QuestionForm), min_entries=1)
     submit = SubmitField("Create Assignment")
 
