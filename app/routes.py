@@ -1,6 +1,6 @@
 #routing for flask project
 from app import app
-from flask import render_template, request, redirect, jsonify
+from flask import render_template, request, redirect, render_template_string, jsonify
 from app.pipeline import check_answer, pipeline2, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
 #import db from module where initialized 
@@ -8,6 +8,7 @@ from app.forms import Login, Signup, CreateAssignment, Submit
 #holds the question_generated obj to be used to generate the assignment fillout
 assignments = []
 submissions = []
+results = []
 #submission= {"student_name":"", "student_id":"", "answers":[]}
 
 idx = 0
@@ -80,7 +81,7 @@ def create_questions():
         # }
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
-        submit_form = Submit()
+        
         assignment_id = len(assignments) - 1
         # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
         return redirect(f"/submit-assignment/{assignment_id}") #will access instructors db to allow sharing of some assignment
@@ -95,10 +96,15 @@ def submit_answers(assignment_id):
         } 
     submit_form = Submit()
     #access latest created assignment from global object
-    results = []
-    current_assignment_dict = assignments[assignment_id]
-    results_element= {"question":"", "answers":[],"expected":[]}
-    if(submit_form.validate_on_submit()):
+    assignment_results = []
+    if isValidAssignment(assignment_id):
+        current_assignment_dict = assignments[assignment_id]
+    else:
+        print("error: incorrect assignment_id in /submit")
+        #raise IndexError("Incorrect assignment_id")
+        return render_template_string("Error code 500 incorrect assignment id")
+    
+    if(request.method == "POST" and submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
         answers = submit_form.answers.data
@@ -109,13 +115,12 @@ def submit_answers(assignment_id):
         #check each corresponding answer with expected error
         print(f"Answers:\n {answers}")
         for question_element in current_assignment_dict:
+            result = {"question":"", "answers":[],"expected":[]}
+            result["question"] = question_element["question"]
             for errorIndex in range(len(question_element["error classes"])):
-                result = results_element
-                result["question"] = question_element["question"]
                 result["answers"].append(answers[answerIndex])
                 result["expected"].append(question_element["error classes"][errorIndex])
-                results.append(result)
-                print(result)
+                
                 # index_str = str(index)
                 # answers.append(submit_form.answer_tag.data)
                 # expected[index_str] = assignments[assignment_id][error_classes]
@@ -124,11 +129,14 @@ def submit_answers(assignment_id):
                 #answers_json = jsonify(answers)
                 #feedback_json = jsonify(feedback)
                 #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
-        print('After adding:')
-        print(results)
-        return render_template_string(f"Successfully submitted!\nResults:\n{results}");
+            assignment_results.append(result)
+            print(f"question result:{result}")
+        print('After adding assignment_results:')
+        print(assignment_results)
+        return render_template_string(f"Successfully submitted!\nResults:\n{results}")
         #feedback = check_answers(answers)
-    return render_template("index.html", submit=submit_form, questions_pair=list(zip(assignments[assignment_id], submit_form.answers)))
+    else:
+        return render_template("index.html", submit=submit_form, questions_pair=list(zip(assignments[assignment_id], submit_form.answers)))
 
     # return "Error with submission"
     # data = request.json
@@ -137,13 +145,29 @@ def submit_answers(assignment_id):
 
 @app.route("/share/<int:assignment_id>")
 def share(assignment_id):#index from assignments list
+    if isValidAssignment(assignment_id):
+        current_assignment_dict = assignments[assignment_id]
+    else:
+        print("error: incorrect assignment_id in /submit")
+        #raise IndexError("Incorrect assignment_id")
+        return render_template_string("Error code 500 incorrect assignment id")
     #assignment = assignments[assignment_id]
     return "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
 
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):
-    submissions = ""
+    #submissions is a global list
+    if not isValidAssignment(assignment_id):
+        print("error: incorrect assignment_id in /submit")
+        #raise IndexError("Incorrect assignment_id")
+        return render_template_string("Error code 500 incorrect assignment id")
     for submission in submissions:
         results+= str(submission)
         results+= "\n"
     return submissions;
+
+
+def isValidAssignment(assignment_id):
+    return assignment_id < len(assignments) and assignment_id >= 0
+      
+        
