@@ -97,7 +97,7 @@ def submit_answers(assignment_id):
     #access latest created assignment from global object
     results = []
     current_assignment_dict = assignments[assignment_id]
-
+    results_element= {"question":"", "answers":[],"expected":[]}
     if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
@@ -107,10 +107,15 @@ def submit_answers(assignment_id):
         #retrieve assignment index from redirect url, 
         #expected = []# for each answer in order from assignment in global assignments list variable { q: "", expected_error_class: ""} 
         #check each corresponding answer with expected error
-
+        print(f"Answers:\n {answers}")
         for question_element in current_assignment_dict:
-            for i in range(len(question_element["error classes"])):
-                
+            for errorIndex in range(len(question_element["error classes"])):
+                result = results_element
+                result["question"] = question_element["question"]
+                result["answers"].append(answers[answerIndex])
+                result["expected"].append(question_element["error classes"][errorIndex])
+                results.append(result)
+                print(result)
                 # index_str = str(index)
                 # answers.append(submit_form.answer_tag.data)
                 # expected[index_str] = assignments[assignment_id][error_classes]
@@ -119,10 +124,10 @@ def submit_answers(assignment_id):
                 #answers_json = jsonify(answers)
                 #feedback_json = jsonify(feedback)
                 #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
-        return render_template_string(f"Successfully submitted!\nResults:\n{answers}");
+        print('After adding:')
+        print(results)
+        return render_template_string(f"Successfully submitted!\nResults:\n{results}");
         #feedback = check_answers(answers)
-        
-    
     return render_template("index.html", submit=submit_form, questions_pair=list(zip(assignments[assignment_id], submit_form.answers)))
 
     # return "Error with submission"
