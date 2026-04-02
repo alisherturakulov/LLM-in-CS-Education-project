@@ -66,7 +66,7 @@ def create_questions():
         
         assignment_id = len(assignments) - 1
         # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
-        return redirect(f"/submit-assignment/{assignment_id}") #will access instructors db to allow sharing of some assignment
+        return redirect(f"./share/{assignment_id}") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
 
@@ -154,7 +154,8 @@ def share(assignment_id):#index from assignments list
         #raise IndexError("Incorrect assignment_id")
         return render_template_string("Error code 500 incorrect assignment id")
     #assignment = assignments[assignment_id]
-    return render_template("share.html", qrcode ="NA", assignment_id= assignment_id) or "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
+    host = request.host_url
+    return render_template("share.html", qrcode ="NA", assignment_id= assignment_id, host_url=request.host_url) or "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
 
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):
