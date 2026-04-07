@@ -5,12 +5,28 @@
       #} 
 -->
 {% extends 'base.html' %}
+{% block extraHeaders%}
+  <!-- for qrcode generation -->
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+{% endblock %}
 
 {% block body %}
 {# access these from the db  or render_template params#}
 <h1>Link to assignment: </h1>
 <a href="{{host_url}}/submit-assignment/{{assignment_id}}"><h3>{{host_url}}/submit-assignment/{{assignment_id}}</h3></a>
-<div id="qrCode">
-  {{qrCode}}
+<div id="{{host_url}}/submit-assignment/{{assignment_id}}" class="qrCode">
+  
 </div>
+<script>
+  
+  document.addEventListener("DOMContentLoaded", () =>{
+    const qrDiv = document.querySelector(".qrCode");
+    new QRCode( qrDiv, {
+      "text": qrDiv.id,
+      "width": 250,
+      "height": 250,
+    }
+    );
+  });
+</script>
 {% endblock%}
