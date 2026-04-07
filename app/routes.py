@@ -3,8 +3,8 @@ from app import app
 from flask import render_template, request, redirect, render_template_string
 from app.pipeline import check_answer, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
-import os, json
-#import db from module where initialized 
+import os, json, portalocker
+#import db from module where initialized, use data folder json for now
 
 #holds the question_generated obj to be used to generate the assignment fillout
 assignments = []
@@ -58,38 +58,52 @@ def create_questions():
         generated_error_questions = generate_questions(questions_for_generating)
         print("Generated_error_questions:\n"+ str(generated_error_questions))
         #to be accessed later in /submit-assignment
-        assignments.append(generated_error_questions)
+        #assignments.append(generated_error_questions)
         
-        assignmentPath = os.path.join("../","/data","/assignments.json")
-
-        assignments = json.load(f)
+        #takes care of file locking concurrency, appends to exisiting data in file
+        newLength = saveToJSON(generated_error_questions, "assignments.json")
         # questions = generate_questions(number_of_qs)
         
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         
-        assignment_id = len(assignments) - 1
+        assignment_id = newLength - 1
         # return render_template("index.html", submit=submit_form, questions=zip(questions.items(), submit_form.answers))
         return redirect(f"./share/{assignment_id}") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
-def saveToJSON(dataObject. dataFile):
-    #save given json data to specified filepath 
-    
-    try:
-        filepath= os.path.join("../", "data/", dataFile)
-        with open(filepath, 'w', encoding="utf-8") as f:
+def saveToJSON(dataToAppend, dataFileName):
+    #with filelocking save given json data to specified filepath 
+    dataLength = 0
+    filepath= os.path.join("../", "data/", dataFileName)
+    with open(filepath, 'r+', encoding="utf-8") as f:
+        try:
+        #preventing concurrent saves using file lock
+            portalocker.lock(f, portalocker.LOCK_EX)
+            
+            dataObject = json.load(f)
+            dataObject.append(dataToAppend)
+            dataLength = len(dataObject)
+            f.seek(0)#back to start of file
             json.dump(dataObject, f, indent=4)
-            return True
-    except (OSError, TypeError) as e:
-        print(e)
-        return False
+            f.truncate()#cuts extra data if dataObject is shorter
+            f.flush()
+            return dataLength
+        except (OSError, TypeError, ValueError) as e:
+            print(e)
+            return -1
+        finally:
+            portalocker.unlock(f)#unlock once done
 
-def loadJSON(dataFile):
+def loadJSON(dataFileName):
+    #with filelocking return a object as a list or dict froom data file
     try:
-            filepath= os.path.join("../","data/",dataFile)
+            filepath= os.path.join("../","data/", dataFileName)
         with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+            with portalocker.lock(f, timeout=7): 
+            #automatically uses LOCK_EX
+            #preventing concurrent saves using file lock
+                return json.load(f)
     except (OSError, TypeError) as e:
         print(e)
         return None
