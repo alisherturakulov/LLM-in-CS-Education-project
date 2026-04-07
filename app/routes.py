@@ -61,9 +61,10 @@ def create_questions():
         #assignments.append(generated_error_questions)
         
         #takes care of file locking concurrency, appends to exisiting data in file
-        newLength = saveToJSON(generated_error_questions, "assignments.json")
+        newLength = addToJSON(generated_error_questions, "assignments.json")
         # questions = generate_questions(number_of_qs)
-        
+        if (newLength <= 0):
+            return render_template_string("Error 500: error append assignment")
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         
@@ -72,7 +73,7 @@ def create_questions():
         return redirect(f"./share/{assignment_id}") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
-def saveToJSON(dataToAppend, dataFileName):
+def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, student_id=-1):
     #with filelocking save given json data to specified filepath 
     dataLength = 0
     filepath= os.path.join("../", "data/", dataFileName)
@@ -82,8 +83,15 @@ def saveToJSON(dataToAppend, dataFileName):
             portalocker.lock(f, portalocker.LOCK_EX)
             
             dataObject = json.load(f)
-            dataObject.append(dataToAppend)
-            dataLength = len(dataObject)
+            if (assignments):#if adding to list (assignments.json)
+                dataObject.append(dataToAdd)
+                dataLength = len(dataObject)
+            else:#if adding to dictionary (submissions)
+                if(assignment_id < 0 or int(student_id) < 0):
+                    print("addToJSON error: assignment_id or student_id incorrect")
+                    raise ValueError("addToJSON assingment_id or student_id incorrect")
+                    return 0
+                dataObject[str(assignment_id)][student_id] = dataToAdd
             f.seek(0)#back to start of file
             json.dump(dataObject, f, indent=4)
             f.truncate()#cuts extra data if dataObject is shorter
@@ -98,7 +106,7 @@ def saveToJSON(dataToAppend, dataFileName):
 def loadJSON(dataFileName):
     #with filelocking return a object as a list or dict froom data file
     try:
-            filepath= os.path.join("../","data/", dataFileName)
+        filepath = os.path.join("../","data/", dataFileName)
         with open(filepath, "r", encoding="utf-8") as f:
             with portalocker.lock(f, timeout=7): 
             #automatically uses LOCK_EX
@@ -117,7 +125,7 @@ def submit_answers(assignment_id):
     submit_form = Submit()
     #access latest created assignment from global object
     assignment_results = []
-    assignments = loadJson("assignments.json")
+    assignments = loadJSON("assignments.json")
     if isValidAssignment(assignments, assignment_id):
         current_assignment_dict = assignments[assignment_id]
     else:
@@ -136,7 +144,8 @@ def submit_answers(assignment_id):
         #check each corresponding answer with expected error
         print(f"Answers:\n {answers}")
         for question_element in current_assignment_dict:
-            result = {"question":"", "answers":[],"expected":[]}
+            result = {"name":"", "question":"", "answers":[],"expected":[]}
+            result["name"] = student_name
             result["question"] = question_element["question"]
             for errorIndex in range(len(question_element["error classes"])):
                 result["answers"].append(answers[answerIndex])
@@ -150,11 +159,14 @@ def submit_answers(assignment_id):
                 #answers_json = jsonify(answers)
                 #feedback_json = jsonify(feedback)
                 #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
-            assignment_results.append(result)
+            newSubmissionsLength = addToJSON(result, "submissions.json", False, assignment_id, student_id)
+            #assignment_results.append(result)
             print(f"question result:{result}")
-        print('After adding assignment_results:')
-        print(assignment_results)
-        return render_template_string(f"Successfully submitted!\nResults:\n{assignment_results}")
+        submissions = loadJSON("submissions.json")
+        
+        print('After adding to assignment_submissions:')
+        print(f"{newSubmissionsLength}\n{submissions}")
+        return render_template_string(f"Successfully submitted!\nResults:\n{submissions}")
         #feedback = check_answers(answers)
     #create a list of generated answers
     
@@ -186,7 +198,8 @@ def submit_answers(assignment_id):
 
 @app.route("/share/<int:assignment_id>")
 def share(assignment_id):#index from assignments list
-    if isValidAssignment(assignment_id):
+    assignments = loadJSON("assignments.json")
+    if isValidAssignment(assignments, assignment_id):
         current_assignment_dict = assignments[assignment_id]
     else:
         print("error: incorrect assignment_id in /submit")
@@ -194,19 +207,21 @@ def share(assignment_id):#index from assignments list
         return render_template_string("Error code 500 incorrect assignment id")
     #assignment = assignments[assignment_id]
     host = request.host_url
-    return render_template("share.html", qrcode ="NA", assignment_id= assignment_id, host_url=request.host_url) or "will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>"
+    return render_template("share.html", assignment_id= assignment_id, host_url=request.host_url) or render_template_string("will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>")
 
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):
-    #submissions is a global list
-    if not isValidAssignment(assignment_id):
+    #submissions json
+    submissions = loadJSON("submissions.json")
+    assignments = loadJSON("assignments.json")
+    if not isValidAssignment(assignments, assignment_id):
         print("error: incorrect assignment_id in /submit")
         #raise IndexError("Incorrect assignment_id")
         return render_template_string("Error code 500 incorrect assignment id")
     for submission in submissions:
         results+= str(submission)
         results+= "\n"
-    return submissions;
+    return submissions
 
 
 def isValidAssignment(assignments, assignment_id):
