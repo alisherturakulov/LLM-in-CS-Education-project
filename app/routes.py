@@ -212,16 +212,17 @@ def share(assignment_id):#index from assignments list
 @app.route("/submissions/<int:assignment_id>")
 def submissions(assignment_id):
     #submissions json
+    results = ""
     submissions = loadJSON("submissions.json")
     assignments = loadJSON("assignments.json")
     if not isValidAssignment(assignments, assignment_id):
         print("error: incorrect assignment_id in /submit")
         #raise IndexError("Incorrect assignment_id")
         return render_template_string("Error code 500 incorrect assignment id")
-    for submission in submissions:
-        results+= str(submission)
-        results+= "\n"
-    return submissions
+    for student_id in submissions[assignment_id].keys():
+            results+= f"\nStudent_id {student_id}:\n{submissions[assignment_id][student_id]}"
+            results+= "\n"
+    return render_template_string(results)
 
 
 def isValidAssignment(assignments, assignment_id):
