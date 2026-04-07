@@ -117,7 +117,8 @@ def submit_answers(assignment_id):
     submit_form = Submit()
     #access latest created assignment from global object
     assignment_results = []
-    if isValidAssignment(assignment_id):
+    assignments = loadJson("assignments.json")
+    if isValidAssignment(assignments, assignment_id):
         current_assignment_dict = assignments[assignment_id]
     else:
         print("error: incorrect assignment_id in /submit")
@@ -208,7 +209,7 @@ def submissions(assignment_id):
     return submissions;
 
 
-def isValidAssignment(assignment_id):
+def isValidAssignment(assignments, assignment_id):
     return assignment_id < len(assignments) and assignment_id >= 0
       
         
