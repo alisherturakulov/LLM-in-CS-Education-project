@@ -1,8 +1,9 @@
 #routing for flask project
 from app import app
-from flask import render_template, request, redirect, render_template_string, jsonify
-from app.pipeline import check_answer, pipeline2, generate_questions
+from flask import render_template, request, redirect, render_template_string
+from app.pipeline import check_answer, generate_questions
 from app.forms import Login, Signup, CreateAssignment, Submit
+import os, json
 #import db from module where initialized 
 
 #holds the question_generated obj to be used to generate the assignment fillout
@@ -59,6 +60,9 @@ def create_questions():
         #to be accessed later in /submit-assignment
         assignments.append(generated_error_questions)
         
+        assignmentPath = os.path.join("../","/data","/assignments.json")
+
+        assignments = json.load(f)
         # questions = generate_questions(number_of_qs)
         
         #to jsonify and pass into template
@@ -69,6 +73,26 @@ def create_questions():
         return redirect(f"./share/{assignment_id}") #will access instructors db to allow sharing of some assignment
     return render_template("form-creator.html", form=assign_form)
 
+def saveToJSON(dataObject. dataFile):
+    #save given json data to specified filepath 
+    
+    try:
+        filepath= os.path.join("../", "data/", dataFile)
+        with open(filepath, 'w', encoding="utf-8") as f:
+            json.dump(dataObject, f, indent=4)
+            return True
+    except (OSError, TypeError) as e:
+        print(e)
+        return False
+
+def loadJSON(dataFile):
+    try:
+            filepath= os.path.join("../","data/",dataFile)
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, TypeError) as e:
+        print(e)
+        return None
 
 @app.route('/submit-assignment/<int:assignment_id>', methods=['GET','POST'])
 def submit_answers(assignment_id):
