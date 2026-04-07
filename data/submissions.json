@@ -1,1 +1,10 @@
-{}
+{
+    "assignment_id": {
+        "student_id":{
+            "name": "",
+            "question":"",
+            "answers": [],
+            "expected":[]
+        }
+    }
+}
