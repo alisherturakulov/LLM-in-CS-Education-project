@@ -11,8 +11,11 @@ function recordHighlight(){
 }
 
 //select all answerfields which are string input fields
-answers= document.querySelectorAll("p.erroneousAnswer + input");
+errorAnswers = document.querySelectorAll("p.erroneousAnswer");
+answerFields = document.querySelectorAll("p.erroneousAnswer + input");
 
+   //For highlight feature
+   //use highlighting when selected by teacher in original form
 //add event listeners to each that check for highlighting
 
 //connect to  recordHighlight function which retrieves the highlighted text
@@ -24,7 +27,14 @@ answers= document.querySelectorAll("p.erroneousAnswer + input");
 //to remove highlights, directly edit the input field
 
 //students can still type in answers but can only
-//use highlighting when selected by teacher in original form
+
+
+   //History feature
+//addEventListener("change")
+//check for changes every few seconds
+//or save a new time after each burst of changes from tpying
+
+//send the change history as a object of time:answer pairs to be put into the submission in submissions.json
 
    /**
              * requests questions form the pipeline running on the server and

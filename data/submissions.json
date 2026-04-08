@@ -1,10 +1,53 @@
 {
     "assignment_id": {
-        "student_id":{
+        "student_id": {
             "name": "",
-            "question":"",
+            "question": "",
             "answers": [],
-            "expected":[]
+            "expected": [],
+            "answer history": {
+                "time":"answer"
+            }
+        }
+    },
+    "6": {
+        "123": {
+            "name": "bob",
+            "question": "6",
+            "answers": [
+                "a1",
+                "a2",
+                "a3"
+            ],
+            "expected": [
+                "0",
+                "1",
+                "2"
+            ]
+        }
+    },
+    "7": {
+        "123": {
+            "name": "bob",
+            "question": "q1",
+            "answers": [
+                "a1"
+            ],
+            "expected": [
+                "0"
+            ]
+        }
+    },
+    "8": {
+        "123": {
+            "name": "bob",
+            "question": "q1",
+            "answers": [
+                "b1"
+            ],
+            "expected": [
+                "0"
+            ]
         }
     }
 }
