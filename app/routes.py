@@ -76,7 +76,8 @@ def create_questions():
 def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, student_id=-1):
     #with filelocking save given json data to specified filepath 
     dataLength = 0
-    filepath= os.path.join("../", "data/", dataFileName)
+    current_filepath = os.path.dirname(__file__)
+    filepath= os.path.join(current_filepath, "..", "data", dataFileName)
     with open(filepath, 'r+', encoding="utf-8") as f:
         try:
         #preventing concurrent saves using file lock
@@ -97,7 +98,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
             f.truncate()#cuts extra data if dataObject is shorter
             f.flush()
             return dataLength
-        except (OSError, TypeError, ValueError) as e:
+        except (OSError, TypeError, ValueError, Exception) as e:
             print(e)
             return -1
         finally:
