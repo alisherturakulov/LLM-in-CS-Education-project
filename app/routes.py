@@ -64,7 +64,7 @@ def create_questions():
         newLength = addToJSON(generated_error_questions, "assignments.json")
         # questions = generate_questions(number_of_qs)
         if (newLength <= 0):
-            return render_template_string("Error 500: error append assignment")
+            return render_template_string("Error 500: in create, error appending assignment")
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         
@@ -77,28 +77,31 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
     #with filelocking save given json data to specified filepath 
     dataLength = 0
     current_filepath = os.path.dirname(__file__)
-    filepath= os.path.join(current_filepath, "..", "data", dataFileName)
-    with open(filepath, 'r+', encoding="utf-8") as f:
-        try:
+    filepath= os.path.join(current_filepath, os.pardir, "data", dataFileName)
+    print(f"path before adding: {filepath}")
+    try:
+        #with open(filepath, 'r+', encoding="utf-8") as file:
         #preventing concurrent saves using file lock
-            with portalocker.Lock(f, timeout=7) as f:
-                #load the object and check whether its assignments(list) or submissions(dictionary)
-                dataObject = json.load(f)
-                if (assignments):#if adding to list (assignments.json)
-                    dataObject.append(dataToAdd)
-                    dataLength = len(dataObject)
-                else:#if adding to dictionary (submissions)
-                    if(assignment_id < 0 or int(student_id) < 0):
-                        print("addToJSON error: assignment_id or student_id incorrect")
-                        raise ValueError("addToJSON assingment_id or student_id incorrect")
-                    dataObject[str(assignment_id)][student_id] = dataToAdd
-                f.seek(0)#back to start of file
-                json.dump(dataObject, f, indent=4)
-                f.truncate()#cuts extra data if dataObject is shorter
-                f.flush()
-        except (OSError, TypeError, ValueError, Exception) as e:
-            print(e)
-            dataLength = -1
+        with portalocker.Lock(filepath, mode="r+", timeout=7, encoding="utf-8") as f:
+            #load the object and check whether its assignments(list) or submissions(dictionary)
+            dataObject = json.load(f)
+            if (assignments):#if adding to list (assignments.json)
+                dataObject.append(dataToAdd)
+                dataLength = len(dataObject)
+            else:#if adding to dictionary (submissions)
+                if(assignment_id < 0 or int(student_id) < 0):
+                    print("addToJSON error: assignment_id or student_id incorrect")
+                    raise ValueError("addToJSON assingment_id or student_id incorrect")
+                if(str(assignment_id) not in dataObject):
+                    dataObject[str(assignment_id)] = {}
+                dataObject[str(assignment_id)][student_id] = dataToAdd
+            f.seek(0)#back to start of file
+            json.dump(dataObject, f, indent=4)
+            f.truncate()#cuts extra data if dataObject is shorter
+            f.flush()
+    except (OSError, TypeError, ValueError, Exception) as e:
+        print(e)
+        dataLength = -1
         
     return dataLength
         # finally:
@@ -109,13 +112,13 @@ def loadJSON(dataFileName):
     dataObject = None
     try:
         current_filepath = os.path.dirname(__file__)
-        filepath = os.path.join(current_filepath,"..","data", dataFileName)
-        with open(filepath, "r", encoding="utf-8") as f:
-            with portalocker.Lock(f, timeout=7) as f: 
-            #automatically uses LOCK_EX
-            #preventing concurrent saves using file lock
-                dataObject = json.load(f)
-    except (OSError, TypeError, Exception) as e:
+        filepath = os.path.join(current_filepath, os.pardir,"data", dataFileName)
+        #with open(filepath, "r", encoding="utf-8") as f:
+        with portalocker.Lock(filepath, mode="r", timeout=7, encoding="utf-8") as f: 
+        #automatically uses LOCK_EX
+        #preventing concurrent saves using file lock
+            dataObject = json.load(f)
+    except (OSError, TypeError) as e:
         print(e)
     return dataObject
 
