@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-
+    {% block extraHeaders %}
+        <script src="{{ url_for('static', filename='js/form-creator.js') }}" defer></script>
+    {% endblock %}
     {% block body %} 
         <!-- <div class="assignment-box">
             <div class="question" id ="sample-question">
@@ -65,7 +67,7 @@
             </button> 
             -->
         </form>
-        <script>
+        <!-- <script>
             //listens and updates based on the number of questions selection field 
             document.addEventListener("DOMContentLoaded", () => {
                 const wrapper = document.querySelector("form#assignment");
@@ -126,5 +128,5 @@
             });
             
 
-        </script>
+        </script> -->
     {% endblock %}
