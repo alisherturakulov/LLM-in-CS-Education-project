@@ -23,6 +23,7 @@ class QuestionForm(FlaskForm):
         csrf = False#csrf will be handled in parent form
     question = StringField("Question Text", validators=[DataRequired()])#error class numbers based on pipeline2 string 'system_prompt_generate1'
     error_types = SelectMultipleField("Error Type", validators=[DataRequired()], choices=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
+    answer_type = SelectField("Answer Input Type", validators=[DataRequired()], choices=[('0','Text'),('1', 'Highlight')])
 class CreateAssignment(FlaskForm):
     number_of_questions = IntegerField("Number of Questions", validators=[DataRequired()])
     questions = FieldList( FormField(QuestionForm), min_entries=1)
