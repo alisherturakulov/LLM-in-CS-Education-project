@@ -1,6 +1,8 @@
 //connects to index.html to handle requests to server
 //script is currently in script tag of index.html
-
+answer_history = {
+   //"time" : "answer", and so on every 
+}
 /**
  * records the part of the question that has been highlighted to put into the stringfield that holds the answers
  * the highlight answer input types are stringfields but store 
@@ -13,6 +15,33 @@ function recordHighlight(){
 //select all answerfields which are string input fields
 errorAnswers = document.querySelectorAll("p.erroneousAnswer");
 answerFields = document.querySelectorAll("p.erroneousAnswer + input");
+form = document.querySelector("form");
+form.on("submit", ()=>{
+   //add the answer_history obejct to the response body, to be processed in the server routes.py
+})
+
+function debounce(callee, delay){
+   clearTimeout(tout)
+   return (args) => {
+
+   }
+}
+
+function autoSaveToHistoryObject(event){
+
+}
+
+answerFields.array.forEach((element) => {
+   element.addEventListener("change", autoSaveToHistoryObject(event));
+   //once the changes are made and the user clicks off, the autosave feature is connected
+   //event.parent.value is saved by using time(): "answer input" to place into history object
+   const currentInput = event.parent.value
+   const time = Time()
+   const currentTime = time.now()
+
+   answer_history[currentTime] = currentInput;
+
+});
 
    //For highlight feature
    //use highlighting when selected by teacher in original form
