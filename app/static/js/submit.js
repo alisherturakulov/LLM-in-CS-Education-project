@@ -35,6 +35,8 @@ function recordHighlight(event){
                 
                 //remove the highlight after processing
                 selection.removeAllRanges();
+                let changeEvent = new Event("change");
+                event.target.dispatchEvent(changeEvent)
             }
       }
 }
@@ -95,7 +97,7 @@ function debounce(callee, delay){
 //save every 3000 ms
 let autoSave = debounce((event) => autoSaveToLogfield(event), 1000);
 //select all answerfields which are string input fields
-const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
+const answerFields = document.querySelectorAll("p.erroneousAnswer ~ input");
 answerFields.forEach((element) => {
    element.addEventListener("change", (e) => autoSave(e));
 });
