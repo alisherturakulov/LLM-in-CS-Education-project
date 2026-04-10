@@ -9,41 +9,90 @@ answer_history = {
  * records the part of the question that has been highlighted to put into the stringfield that holds the answers
  * the highlight answer input types are stringfields but store 
  * on separate lines the highlighted text in order of appearance in the question
+ * @param {Event} event the mouseup event
  */
-function recordHighlight(){
+function recordHighlight(event){
+      const selection = window.getSelection();
+      const highlightedText = selection.toString().trim();//current highlighted text 
+      
+
+      const correspondingInput = event.target.nextElementSibling;//answerfield is consecutive input after <p.erroneousAnswer> container of the question string
+
+      correspondingInput.value += newAddition
+      if (highlightedText.length > 0) {
+            //get corresponding input (the sibling of the <p>)
+            const correspondingInput = element.nextElementSibling;
+
+            if (correspondingInput && correspondingInput.tagName === "INPUT") {
+                //Append with a newline (use a comma or space if it's a standard text input)
+               
+                const separator = correspondingInput.value === "" ? "" : "\n";
+                correspondingInput.value += separator + highlightedText;
+                
+                //remove the highlight after processing
+                selection.removeAllRanges();
+            }
+      }
+
+   
 
 }
 
+
+/**
+ * records the current value of the input field and the time of recording
+ * on a new line int he logfield
+ * @param {Event} event the event attached to the call
+ */
+function autoSaveToLogfield(event){
+   const inputField = event.target
+   const inputValue = inputField.value
+   const logField = inputField.nextElementSibling;    //update history
+   
+
+    //time in est
+    const currentTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/New_York",
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+   logField.value += currentTime + " EST: " + inputValue + "|";//| mark each line of logs
+   //logfields to be processed on the server
+}
+
+
+
 //select all answerfields which are string input fields
-errorAnswers = document.querySelectorAll("p.erroneousAnswer");
-answerFields = document.querySelectorAll("p.erroneousAnswer + input");
-form = document.querySelector("form");
-form.on("submit", ()=>{
-   //add the answer_history obejct to the response body, to be processed in the server routes.py
-})
+const errorAnswers = document.querySelectorAll("p.erroneousAnswer");
+const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
+const form = document.querySelector("form");
 
+
+/**
+ * @param {Function} callee the function
+ * @param {number} delay the ms delay to fire the functoin
+ */
 function debounce(callee, delay){
-   clearTimeout(tout)
-   return (args) => {
-
+   let timeoutVar;
+   return (...args) => {
+      clearTimeout(timeoutVar)
+      timeoutVar = setTimeout(() => {
+         callee.apply(this, args);
+      }, delay);
    }
 }
 
-function autoSaveToHistoryObject(event){
-
-}
+//every 3000 ms
+let autoSave = debounce((event) => autoSaveToLogfield(event), 3000);
 
 answerFields.array.forEach((element) => {
-   element.addEventListener("change", autoSaveToHistoryObject(event));
-   //once the changes are made and the user clicks off, the autosave feature is connected
-   //event.parent.value is saved by using time(): "answer input" to place into history object
-   const currentInput = event.parent.value
-   const time = Time()
-   const currentTime = time.now()
-
-   answer_history[currentTime] = currentInput;
-
+   element.addEventListener("input", autoSave);
 });
+
+
+
 
    //For highlight feature
    //use highlighting when selected by teacher in original form
@@ -57,21 +106,14 @@ answerFields.array.forEach((element) => {
 
 //to remove highlights, directly edit the input field
 
-//students can still type in answers but can only
+//students can still type in answers but can only use highlighting if selected for that field
+
 errorAnswers.forEach((element) => {
-   element.addEventListener("mousedown", autoSaveToHistoryObject(event));
    //retreive the current highlighted text and append to a string;
    //separated by \n characters so place a \n character before kadding to the string each time
-   const highlightedText = //highlighted text
-   const newAddition = "\n" + highlightedText
-
-   const currentTime = time.now()
-   const correspondingInput = event.parent.querySelector("input");
-
-   correspondingInput.value += newAddition
-
-   
-});
+   element.addEventListener( "mouseup", (event)=>{//mouseup once done highlighting
+      recordHighlight(event);
+   });
 
    //History feature
 //addEventListener("change")
