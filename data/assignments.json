@@ -142,5 +142,70 @@
                 "0"
             ]
         }
+    ],
+    [
+        {
+            "question": "q9",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0",
+                "1",
+                "2"
+            ]
+        }
+    ],
+    [
+        {
+            "question": "question text 1",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0"
+            ]
+        },
+        {
+            "question": "question text 2",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "1",
+                "3"
+            ]
+        },
+        {
+            "question": "question text 3",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0",
+                "1",
+                "2"
+            ]
+        }
+    ],
+    [
+        {
+            "question": "q1",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0",
+                "1",
+                "2"
+            ]
+        }
     ]
 ]
