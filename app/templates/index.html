@@ -30,9 +30,9 @@
 
         {# Use a loop to go through the FieldList #}
 
-        {# for each assignment, pair each error answer with an answerfield where both should have the same number of elements to match up#}
+        {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
         
-        {% for (erroneousAnswer), (answerfield) in questions_pair %}
+        {% for (erroneousAnswer), (answerfield), (logfield) in questions_tuple %}
             
             {% if corresponding_questions[loop.index0] != "" %}
                     <h3 class="questionNumber">Question {{loop.index}}</h3>
@@ -46,7 +46,8 @@
             </p>
             {{ answerfield.label }}
             {{ answerfield() }}
-
+            <!-- history -->
+            {{ logfield() }}
             
             
             {% if answerfield.errors %}

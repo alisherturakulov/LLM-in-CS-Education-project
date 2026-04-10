@@ -36,6 +36,6 @@ class Submit(FlaskForm):
     student_name = StringField("Student Name", validators=[DataRequired()])
     student_id = StringField("Student ID", validators=[DataRequired()])
     answers = FieldList(StringField("Answer", validators=[DataRequired()]), min_entries=0)
-    history = StringField("History", render_kw={"hidden":True})
+    answer_logs = FieldList(StringField("History", render_kw={"hidden":True}), min_entries=0)
     submit = SubmitField("Submit Assignment")
 
