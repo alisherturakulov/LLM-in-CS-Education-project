@@ -6,7 +6,7 @@
             "answers": [],
             "expected": [],
             "answer history": {
-                "time":"answer"
+                "time": "answer"
             }
         }
     },
@@ -23,6 +23,11 @@
                 "0",
                 "1",
                 "2"
+            ],
+            "answer history": [
+                "",
+                "this should be history q1B a2",
+                ""
             ]
         }
     },

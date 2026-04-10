@@ -62,14 +62,6 @@ function autoSaveToLogfield(event){
    //logfields to be processed on the server
 }
 
-
-
-//select all answerfields which are string input fields
-const errorAnswers = document.querySelectorAll("p.erroneousAnswer");
-const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
-const form = document.querySelector("form");
-
-
 /**
  * @param {Function} callee the function
  * @param {number} delay the ms delay to fire the functoin
@@ -83,6 +75,21 @@ function debounce(callee, delay){
       }, delay);
    }
 }
+
+//select all answerfields which are string input fields
+const errorAnswers = document.querySelectorAll("p.erroneousAnswer");
+const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
+const form = document.querySelector("form");
+
+errorAnswers.forEach((element) => {
+   //retreive the current highlighted text and append to a string;
+   //separated by \n characters so place a \n character before kadding to the string each time
+   element.addEventListener( "mouseup", (event)=>{//mouseup once done highlighting
+      recordHighlight(event);
+   });
+});
+
+
 
 //every 3000 ms
 let autoSave = debounce((event) => autoSaveToLogfield(event), 3000);
@@ -108,12 +115,6 @@ answerFields.array.forEach((element) => {
 
 //students can still type in answers but can only use highlighting if selected for that field
 
-errorAnswers.forEach((element) => {
-   //retreive the current highlighted text and append to a string;
-   //separated by \n characters so place a \n character before kadding to the string each time
-   element.addEventListener( "mouseup", (event)=>{//mouseup once done highlighting
-      recordHighlight(event);
-   });
 
    //History feature
 //addEventListener("change")

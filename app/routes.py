@@ -143,6 +143,8 @@ def submit_answers(assignment_id):
         student_name = submit_form.student_name.data
         student_id = submit_form.student_id.data
         answers = submit_form.answers.data
+        answer_logs = submit_form.answer_logs.data
+        print(f"#########answer logs:\n {answer_logs}")
         answerIndex = 0
         #add to intructor's respective assignment submissions column as table
         #retrieve assignment index from redirect url, 
@@ -150,13 +152,13 @@ def submit_answers(assignment_id):
         #check each corresponding answer with expected error
         print(f"Answers:\n {answers}")
         for question_element in current_assignment_dict:
-            result = {"name":"", "question":"", "answers":[],"expected":[]}
+            result = {"name":"", "question":"", "answers":[],"expected":[], "answer history":[]}
             result["name"] = student_name
             result["question"] = question_element["question"]
             for errorIndex in range(len(question_element["error classes"])):
                 result["answers"].append(answers[answerIndex])
                 result["expected"].append(question_element["error classes"][errorIndex])
-                
+                result["answer history"].append(answer_logs[answerIndex])
                 # index_str = str(index)
                 # answers.append(submit_form.answer_tag.data)
                 # expected[index_str] = assignments[assignment_id][error_classes]
@@ -170,9 +172,9 @@ def submit_answers(assignment_id):
             print(f"question result:{result}")
         submissions = loadJSON("submissions.json")
         
-        print('After adding to assignment_submissions:')
+        print('After adding result to submissions:')
         print(f"{newSubmissionsLength}\n{submissions}")
-        return render_template_string(f"Successfully submitted!\nResults:\n{submissions}")
+        return render_template_string(f"Successfully submitted!Submissions: \n{submissions}")
         #feedback = check_answers(answers)
     #create a list of generated answers
     
@@ -196,7 +198,7 @@ def submit_answers(assignment_id):
     #     print(f"{submit_form.answers.entries}\n{corresponding_questions}")
     #     return render_template_string(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers.entries)} != {len(corresponding_questions)}\n{submit_form.answers.entries}\n{corresponding_questions}")
     
-    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_pair=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs))
+    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs))
 
     # return "Error with submission"
     # data = request.json
