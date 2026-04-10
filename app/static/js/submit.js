@@ -30,7 +30,7 @@ function recordHighlight(event){
             if (correspondingInput && correspondingInput.tagName === "INPUT") {
                 //Append with a newline (use a comma or space if it's a standard text input)
                
-                const separator = correspondingInput.value === "" ? "" : "\n";
+                const separator = correspondingInput.value === "" ? "" : " ";
                 correspondingInput.value += separator + highlightedText;
                 
                 //remove the highlight after processing
@@ -56,8 +56,14 @@ errorAnswers.forEach((element) => {
 function autoSaveToLogfield(event){
    const inputField = event.target
    const inputValue = inputField.value
-   const logField = inputField.parentElement.querySelector("input[hidden]") || inputField.nextElementSibling;    //update history
+   let sibling = event.target.nextElementSibling;
+   while(sibling && sibling.nextElementSibling.tagName !== "INPUT"){
+      sibling  = sibling.nextElementSibling;
+      console.log(sibling.tagName)
+   }
+   const logField = sibling;    //update history
    
+   console.log("finally: " + logField.tagName)
 
     //time in est
     const currentTime = new Date().toLocaleString("en-US", {
@@ -87,11 +93,11 @@ function debounce(callee, delay){
 }
 
 //save every 3000 ms
-let autoSave = debounce((event) => autoSaveToLogfield(event), 3000);
+let autoSave = debounce((event) => autoSaveToLogfield(event), 1000);
 //select all answerfields which are string input fields
 const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
 answerFields.forEach((element) => {
-   element.addEventListener("input", autoSave);
+   element.addEventListener("change", (e) => autoSave(e));
 });
 
 
