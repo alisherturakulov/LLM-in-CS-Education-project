@@ -5,6 +5,8 @@ answer_history = {
 }
 
 
+const form = document.querySelector("form");
+
 /**
  * records the part of the question that has been highlighted to put into the stringfield that holds the answers
  * the highlight answer input types are stringfields but store 
@@ -15,14 +17,16 @@ function recordHighlight(event){
       const selection = window.getSelection();
       const highlightedText = selection.toString().trim();//current highlighted text 
       
+      //console.log(highlightedText);
 
-      const correspondingInput = event.target.nextElementSibling;//answerfield is consecutive input after <p.erroneousAnswer> container of the question string
-
-      correspondingInput.value += newAddition
+      
       if (highlightedText.length > 0) {
-            //get corresponding input (the sibling of the <p>)
-            const correspondingInput = element.nextElementSibling;
-
+                 //answerfield is consecutive input after <p.erroneousAnswer> container of the question string
+            let sibling = event.target.nextElementSibling;
+            while(sibling && sibling.tagName !== "INPUT"){
+               sibling = sibling.nextElementSibling;
+            }
+            const correspondingInput = sibling;
             if (correspondingInput && correspondingInput.tagName === "INPUT") {
                 //Append with a newline (use a comma or space if it's a standard text input)
                
@@ -33,21 +37,26 @@ function recordHighlight(event){
                 selection.removeAllRanges();
             }
       }
-
-   
-
 }
+
+const errorAnswers = document.querySelectorAll("p.erroneousAnswer");
+
+errorAnswers.forEach((element) => {
+   //retreive the current highlighted text and append to a string;
+   //separated by \n characters so place a \n character before kadding to the string each time
+   element.addEventListener( "mouseup", recordHighlight);//mouseup once done highlighting
+});
 
 
 /**
  * records the current value of the input field and the time of recording
  * on a new line int he logfield
- * @param {Event} event the event attached to the call
+ * @param {InputEvent} event the input event attached to the call
  */
 function autoSaveToLogfield(event){
    const inputField = event.target
    const inputValue = inputField.value
-   const logField = inputField.nextElementSibling;    //update history
+   const logField = inputField.parentElement.querySelector("input[hidden]") || inputField.nextElementSibling;    //update history
    
 
     //time in est
@@ -58,7 +67,8 @@ function autoSaveToLogfield(event){
         second: '2-digit',
         hour12: false
     });
-   logField.value += currentTime + " EST: " + inputValue + "|";//| mark each line of logs
+
+   logField.value += currentTime + " EST: " + inputValue + ";";// semicolons mark each line of logs
    //logfields to be processed on the server
 }
 
@@ -68,7 +78,7 @@ function autoSaveToLogfield(event){
  */
 function debounce(callee, delay){
    let timeoutVar;
-   return (...args) => {
+   return function(...args){
       clearTimeout(timeoutVar)
       timeoutVar = setTimeout(() => {
          callee.apply(this, args);
@@ -76,25 +86,11 @@ function debounce(callee, delay){
    }
 }
 
-//select all answerfields which are string input fields
-const errorAnswers = document.querySelectorAll("p.erroneousAnswer");
-const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
-const form = document.querySelector("form");
-
-errorAnswers.forEach((element) => {
-   //retreive the current highlighted text and append to a string;
-   //separated by \n characters so place a \n character before kadding to the string each time
-   element.addEventListener( "mouseup", (event)=>{//mouseup once done highlighting
-      recordHighlight(event);
-   });
-});
-
-
-
-//every 3000 ms
+//save every 3000 ms
 let autoSave = debounce((event) => autoSaveToLogfield(event), 3000);
-
-answerFields.array.forEach((element) => {
+//select all answerfields which are string input fields
+const answerFields = document.querySelectorAll("p.erroneousAnswer + input");
+answerFields.forEach((element) => {
    element.addEventListener("input", autoSave);
 });
 
