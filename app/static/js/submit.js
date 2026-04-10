@@ -3,6 +3,8 @@
 answer_history = {
    //"time" : "answer", and so on every 
 }
+
+
 /**
  * records the part of the question that has been highlighted to put into the stringfield that holds the answers
  * the highlight answer input types are stringfields but store 
@@ -56,7 +58,20 @@ answerFields.array.forEach((element) => {
 //to remove highlights, directly edit the input field
 
 //students can still type in answers but can only
+errorAnswers.forEach((element) => {
+   element.addEventListener("mousedown", autoSaveToHistoryObject(event));
+   //retreive the current highlighted text and append to a string;
+   //separated by \n characters so place a \n character before kadding to the string each time
+   const highlightedText = //highlighted text
+   const newAddition = "\n" + highlightedText
 
+   const currentTime = time.now()
+   const correspondingInput = event.parent.querySelector("input");
+
+   correspondingInput.value += newAddition
+
+   
+});
 
    //History feature
 //addEventListener("change")
