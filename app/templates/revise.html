@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+    {% block extraHeaders %}
+        <script src="{{ url_for('static', filename='js/submit.js') }}" defer></script>
+    {% endblock %}
+    {% block body %}
+    <!-- <button type="button" onclick="loadQuestions()">
+        Load Quesitons
+    </button> -->
+
+    <h3>Possible Error Types</h2>
+    <ol start="0">
+        <li>'Mental Typo'</li>
+        <li>'Knowledge Gap'</li>
+        <li>'Misconception'</li>
+        <li>'Wrong Choice'</li>
+        <li>'Structural Blindness'</li>
+    </ol>
+    <h1>Assignment</h1>
+    <form class="assignment" action="" method="post">
+        <!--
+        If multiple questions are received in json form from server,
+        each h3 will have a number ordered by the index of the question
+        -->
+        
+        {{ submit.hidden_tag() }}
+        {{ submit.student_name.label}}
+        {{ submit.student_name()}}
+        {{ submit.student_id.label}}
+        {{ submit.student_id()}}
+
+        {# Use a loop to go through the FieldList #}
+
+        {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
+        
+        {% for (erroneousAnswer), (answerfield), (logfield) in questions_tuple %}
+            
+            {% if corresponding_questions[loop.index0] != "" %}
+                    <h3 class="questionNumber">Question {{loop.index}}</h3>
+                    <p class="question">{{ corresponding_questions[loop.index0] }}</p>
+            {% endif %}
+                
+            <h5>Identify the error in the solution(s) below:</h5>
+            {{ model_feedback }}
+            <p class="erroneousAnswer">
+                {{ erroneousAnswer }}
+            </p>
+            
+            {{ answerfield.label }}
+            {{ answerfield() }}
+            {{ logfield() }} {# answer log field; comment here breaks nextElementSibling #}
+            
+            
+            {% if answerfield.errors %}
+                <ul>
+                    {% for error in answerfield.errors %}
+                        <li style="color:red;">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+        {% endfor %}
+        {{ submit.submit.label }}
+        {{ submit.submit() }}
+        <!-- <div class="question">
+            <h3>Question</h3>
+            <p class="question">
+                sample question
+            </p>
+            <p class="sampleSolution">
+                sample solution
+            </p>
+            <p>Enter the type of error in the solution: </p>
+            <input type="text" class="errorAnswer" id="errorAnswer" placeholder="enter type of error">
+        </div>
+        <button type="button" onclick="submitAnswers()">
+            Submit Answers
+        </button>
+            -->
+    </form>
+    <script class="commentScript">
+      
+    </script>
+    {% endblock %}

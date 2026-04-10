@@ -233,6 +233,9 @@ def submissions(assignment_id):
             results+= "\n"
     return render_template_string(results)
 
+@app.route("/revise/<int:assignment_id>/<int:revision>")
+def revise(assignment_id, revision):
+    return render_template_string("revision")
 
 def isValidAssignment(assignments: list, assignment_id: int):
     return assignment_id < len(assignments) and assignment_id >= 0
