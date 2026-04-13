@@ -15,7 +15,9 @@
         <li>'Wrong Choice'</li>
         <li>'Structural Blindness'</li>
     </ol>
-    <h1>Assignment</h1>
+    <h1>
+        Assignment
+    </h1>
     <form class="assignment" action="" method="post">
         <!--
         If multiple questions are received in json form from server,
@@ -32,15 +34,23 @@
 
         {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
         
-        {% for (erroneousAnswer), (answerfield), (logfield) in questions_tuple %}
+        {% for (erroneousAnswer), (answerfield), (logfield), (comment) in questions_tuple %}
             
             {% if corresponding_questions[loop.index0] != "" %}
-                    <h3 class="questionNumber">Question {{loop.index}}</h3>
-                    <p class="question">{{ corresponding_questions[loop.index0] }}</p>
+                    <h3 class="questionNumber">
+                        Question {{loop.index}}
+                    </h3>
+                    <p class="question">
+                        {{ corresponding_questions[loop.index0] }}
+                    </p>
             {% endif %}
                 
-            <h5>Identify the error in the solution(s) below:</h5>
-            {{ model_feedback }}
+            <h5>
+                Identify the error in the solution(s) below:
+            </h5>
+            <p class="comment">
+                {{ comment }}
+            </p>
             <p class="erroneousAnswer">
                 {{ erroneousAnswer }}
             </p>
@@ -78,6 +88,6 @@
             -->
     </form>
     <script class="commentScript">
-      
+        
     </script>
     {% endblock %}

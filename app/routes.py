@@ -177,7 +177,7 @@ def submit_answers(assignment_id):
         return render_template_string(f"Successfully submitted!Submissions: \n{submissions}")
         #feedback = check_answers(answers)
     #create a list of generated answers
-    
+    comments = []
     erroneous_solutions = []
     corresponding_questions = []#list of str questions corresp. to their first erroroneous answer if "" dont print question
     for assignment in current_assignment_dict:
@@ -187,7 +187,7 @@ def submit_answers(assignment_id):
                 corresponding_questions.append(assignment["question"])
             else: 
                 corresponding_questions.append("")
-            
+            comments = generate_feedback(zip(answers, expected))
             erroneous_solutions.append(error_answer)
             #answwers fieldlist should have length same as erroneous_solutions
             submit_form.answers.append_entry("")
@@ -198,7 +198,7 @@ def submit_answers(assignment_id):
     #     print(f"{submit_form.answers.entries}\n{corresponding_questions}")
     #     return render_template_string(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers.entries)} != {len(corresponding_questions)}\n{submit_form.answers.entries}\n{corresponding_questions}")
     
-    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs))
+    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs, comments))
 
     # return "Error with submission"
     # data = request.json
@@ -235,7 +235,70 @@ def submissions(assignment_id):
 
 @app.route("/revise/<int:assignment_id>/<int:revision>")
 def revise(assignment_id, revision):
-    return render_template_string("revision")
+    revised_assignment = {
+        "question": "",
+        "answers": [""],
+        "expected": [""],
+        "comments":[""],
+        "answer history": ["<time>:<input>;"]
+    } 
+    submit_form = Submit()
+    #access latest created assignment from global object
+    assignment_results = []
+    assignments = loadJSON("assignments.json")
+    if isValidAssignment(assignments, assignment_id):
+        current_assignment_dict = assignments[assignment_id]
+    else:
+        print("error: incorrect assignment_id in /submit")
+        #raise IndexError("Incorrect assignment_id")
+        return render_template_string("Error code 500 incorrect assignment id")
+    
+    if(submit_form.validate_on_submit()):
+        student_name = submit_form.student_name.data
+        student_id = submit_form.student_id.data
+        answers = submit_form.answers.data
+        answer_logs = submit_form.answer_logs.data
+        print(f"#########answer logs:\n {answer_logs}")
+        answerIndex = 0
+       
+        for question_element in current_assignment_dict:
+            result = {"name":"", "question":"", "answers":[],"expected":[], "answer history":[]}
+            result["name"] = student_name
+            result["question"] = question_element["question"]
+            for errorIndex in range(len(question_element["error classes"])):
+                result["answers"].append(answers[answerIndex])
+                result["expected"].append(question_element["error classes"][errorIndex])
+                
+                answerIndex += 1
+                
+                #add answers to instructor_id's specific assignment's submissions table (see PROTOTYPE.md)
+            newSubmissionsLength = addToJSON(result, "submissions.json", False, assignment_id, student_id)
+            #assignment_results.append(result)
+            print(f"question result:{result}")
+        submissions = loadJSON("submissions.json")
+        
+        print('After adding result to submissions:')
+        print(f"{newSubmissionsLength}\n{submissions}")
+        return render_template_string(f"Successfully submitted!Submissions: \n{result}")
+        #feedback = check_answers(answers)
+    #create a list of generated answers
+    
+    erroneous_solutions = []
+    corresponding_questions = []#list of str questions corresp. to their first erroroneous answer if "" dont print question
+    for assignment in current_assignment_dict:
+        for i  in range(len(assignment["error answers"])):
+            error_answer = assignment["error answers"][i]
+            if i == 0:
+                corresponding_questions.append(assignment["question"])
+            else: 
+                corresponding_questions.append("")
+            
+            erroneous_solutions.append(error_answer)
+            #answwers fieldlist should have length same as erroneous_solutions
+            submit_form.answers.append_entry("")
+            submit_form.answer_logs.append_entry("")
+    
+    return render_template("revise.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs))
 
 def isValidAssignment(assignments: list, assignment_id: int):
     return assignment_id < len(assignments) and assignment_id >= 0
