@@ -207,5 +207,38 @@
                 "2"
             ]
         }
+    ],
+    [
+        {
+            "question": "question text 1",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "2"
+            ]
+        },
+        {
+            "question": "question text 2",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0"
+            ]
+        },
+        {
+            "question": "question text 3",
+            "error answers": [
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first",
+                "generated solution goes here; uncomment pipeline call first"
+            ],
+            "error classes": [
+                "0",
+                "1",
+                "2"
+            ]
+        }
     ]
 ]
