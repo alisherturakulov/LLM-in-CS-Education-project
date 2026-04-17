@@ -463,6 +463,62 @@
                         "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
                         "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
                     ]
+                },
+                {
+                    "name": "bob`",
+                    "question": "question text 1",
+                    "answers": [
+                        "a1"
+                    ],
+                    "expected": [
+                        "2"
+                    ],
+                    "answer history": [
+                        "4/17/2026, 1:01:10 PM : a1;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "bob`",
+                    "question": "question text 2",
+                    "answers": [
+                        "history gets recorded after 5 seconds of last input"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/17/2026, 1:01:15 PM : a2;4/17/2026, 1:01:57 PM : a2 error with above solution;4/17/2026, 1:02:43 PM : history gets recorded after 5 seconds of last input;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "bob`",
+                    "question": "question text 3",
+                    "answers": [
+                        "a31",
+                        "a32",
+                        "a33"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2"
+                    ],
+                    "answer history": [
+                        "4/17/2026, 1:01:19 PM : a31;",
+                        "4/17/2026, 1:01:22 PM : a32;",
+                        "4/17/2026, 1:01:26 PM : a33;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
                 }
             ]
         }
