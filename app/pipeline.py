@@ -360,13 +360,78 @@ def check_answer(question_and_sample_answer: str, answer: str, expected_error_ty
                 """
   return "placeholder"
 #assignment { q: "", expected_error_class: ""}
-def check_answers(answers, assignment):
-  #need to access the db column of actual answers form when the problems were generated
-  #then compare with the answer received using inputStr.indexOf(expectedStr.toLower())
-  # for(answer in answers.values()):
-  
-    #check_answer()
-  return "placeholder correct"
+def _flatten_assignment(assignment):
+  """Turn assignment (list of question dicts) into a flat list of tuples
+  in the same order used by the forms: (question, erroneous_answer, expected_error_class)
+  """
+  flat = []
+  if not assignment:
+    return flat
+  # allow single-question dict
+  if isinstance(assignment, dict):
+    assignment = [assignment]
+  for q in assignment:
+    question_text = q.get('question','')
+    err_answers = q.get('error answers', [])
+    err_classes = q.get('error classes', [])
+    for i, ea in enumerate(err_answers):
+      cls = err_classes[i] if i < len(err_classes) else ''
+      flat.append({'question': question_text, 'erroneous': ea, 'expected': str(cls)})
+  return flat
+
+def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini'):
+  """Generate concise revision feedback comments for each answer.
+
+  - answers: list of student's answer strings (flat order matching assignment)
+  - assignment: list (or single dict) of generated question dicts (with 'question','error answers','error classes')
+  - prior_answers: optional list of prior answer strings (same flat order) to compare improvements
+
+  Returns list of comment strings, one per answer.
+  """
+  flat = _flatten_assignment(assignment)
+  comments = []
+  if not flat:
+    return ["(No guidance available)" for _ in answers]
+
+  # ensure lists
+  if prior_answers is None:
+    prior_answers = [None] * len(flat)
+
+  for i, item in enumerate(flat):
+    student_answer = answers[i] if i < len(answers) else ""
+    prev = prior_answers[i] if i < len(prior_answers) else None
+    # build prompt
+    prompt = f"Question: {item['question']}\n"
+    prompt += f"Original (erroneous) solution: {item['erroneous']}\n"
+    prompt += f"Expected error type (index): {item['expected']}\n"
+    prompt += f"Student's revised answer: {student_answer or '[no answer]'}\n"
+    if prev:
+      prompt += f"Previous attempt: {prev}\n"
+      prompt += "Compare the previous attempt with the student's revised answer and give concise, specific feedback focused on what changed, what remains wrong (if anything), and one actionable suggestion to improve.\n"
+    else:
+      prompt += "Give concise, specific feedback identifying the error in the original solution and one actionable suggestion for the student to revise their answer.\n"
+
+    system = (
+      "You are an expert math tutor. Provide short (1-3 sentence) actionable feedback aimed at helping a student revise their answer. "
+      "Be specific about the mistake, note any improvement compared to the previous attempt (when provided), and give a single clear suggestion for the next revision."
+    )
+
+    try:
+      completion = generatorOpenAI(prompt, model, system, temperature=0.5)
+      text = completion.choices[0].message.content.strip()
+      # keep only first paragraph for brevity
+      comment = text.split('\n\n')[0]
+      if not comment:
+        comment = "(No feedback generated)"
+    except Exception as e:
+      # fallback heuristic
+      if not student_answer:
+        comment = "No answer submitted — try writing a short explanation of your steps."
+      else:
+        comment = "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+    comments.append(comment)
+
+  return comments
 #flask routing
 
 # //host app
