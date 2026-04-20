@@ -64,6 +64,7 @@ form {
     border-bottom: none;
 }
 
+
 /* =========================================
    Typography & Elements
    ========================================= */
@@ -119,4 +120,28 @@ p.comment {
 /* Placeholder styling */
 .questionGroup input::placeholder {
     color: #9ca3af;
+}
+
+nav {
+    border-bottom: solid 1px;
+    display:inline-block;
+    
+}
+
+nav ul {
+    list-style-type:none ;
+    display: inline-flex;
+    
+}
+
+nav ul li a {   
+        color:#142734;
+        text-decoration: none;
+}
+
+input.inline {
+    line-height: inherit;
+    border-radius:5px;
+    text-decoration: none;
+    field-sizing:content;
 }
