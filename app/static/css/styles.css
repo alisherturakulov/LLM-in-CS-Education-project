@@ -1,7 +1,7 @@
 /*
 Styles for index.html form
 */
-
+/*
 body{
   display:flex;
   flex-flow:column nowrap;  
@@ -24,7 +24,7 @@ body{
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
+}*/
 
 body {
     /* Modern, clean sans-serif font stack */
@@ -36,12 +36,13 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    flex-wrap:wrap;
 }
 
 /* =========================================
    Container Styles
    ========================================= */
-.form-container {
+form {
     background-color: #ffffff;
     width: 100%;
     max-width: 600px;
@@ -50,14 +51,14 @@ body {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Soft, elegant shadow */
 }
 
-.question-group {
+.questionGroup {
     margin-bottom: 32px;
     padding-bottom: 32px;
     border-bottom: 1px solid #e5e7eb; /* Divider between questions */
 }
 
 /* Remove the border from the very last question */
-.question-group:last-child {
+.questionGroup:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
@@ -71,6 +72,14 @@ p.question {
     font-weight: 600;
     color: #111827;
     margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+p.erraneousAnswer {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #142734;
+    margin-bottom: 6px ;
     line-height: 1.4;
 }
 
@@ -88,7 +97,7 @@ p.comment {
 /* =========================================
    Input Styles
    ========================================= */
-.question-group input {
+.questionGroup input {
     width: 100%;
     padding: 14px 16px;
     font-size: 1rem;
@@ -100,7 +109,7 @@ p.comment {
 }
 
 /* Focus state: When the user clicks inside the input */
-.question-group input:focus {
+.questionGroup input:focus {
     outline: none;
     border-color: #3b82f6; /* Highlight border blue */
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); /* Soft blue glow */
@@ -108,6 +117,6 @@ p.comment {
 }
 
 /* Placeholder styling */
-.question-group input::placeholder {
+.questionGroup input::placeholder {
     color: #9ca3af;
 }

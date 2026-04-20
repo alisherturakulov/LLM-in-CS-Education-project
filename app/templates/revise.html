@@ -34,32 +34,34 @@
 
         {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
         
+        {% set qnum = namespace(number=1) %}
         {% for (erroneousAnswer), (answerfield), (logfield), (comment) in questions_tuple %}
-            
-            {% if corresponding_questions[loop.index0] != "" %}
-                    <h3 class="questionNumber">
-                        Question {{loop.index}}
-                    </h3>
-                    <p class="question">
-                        {{ corresponding_questions[loop.index0] }}
-                    </p>
-            {% endif %}
+            <div class="questionGroup">
+                {% if corresponding_questions[loop.index0] != "" %}
+                        <h3 class="questionNumber">
+                            Question {{ qnum.number }}
+                        </h3>
+                        {% set qnum.number = qnum.number + 1 %}
+                        <p class="question">
+                            {{ corresponding_questions[loop.index0] }}
+                        </p>
+                {% endif %}
+                    
+                <h5>
+                    Identify the error in the solution(s) below:
+                </h5>
+                <p class="comment">
+                    {{ comment }}
+                </p>
+                <p class="erroneousAnswer">
+                    {{ erroneousAnswer }}
+                </p>
                 
-            <h5>
-                Identify the error in the solution(s) below:
-            </h5>
-            <p class="comment">
-                {{ comment }}
-            </p>
-            <p class="erroneousAnswer">
-                {{ erroneousAnswer }}
-            </p>
+                {{ answerfield.label }}
+                {{ answerfield() }}
+                {{ logfield() }} {# answer log field; comment here breaks nextElementSibling #}
             
-            {{ answerfield.label }}
-            {{ answerfield() }}
-            {{ logfield() }} {# answer log field; comment here breaks nextElementSibling #}
-            
-            
+            </div>
             {% if answerfield.errors %}
                 <ul>
                     {% for error in answerfield.errors %}
