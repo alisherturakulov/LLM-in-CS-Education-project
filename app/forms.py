@@ -23,7 +23,7 @@ class QuestionForm(FlaskForm):
         csrf = False#csrf will be handled in parent form
     question = StringField("Question Text", validators=[DataRequired()])#error class numbers based on pipeline2 string 'system_prompt_generate1'
     error_types = SelectMultipleField("Error Type", validators=[DataRequired()], choices=[('0', 'Mental Typo'),( '1', 'Knowledge Gap'),('2', 'Misconception'),('3', 'Wrong Choice'),( '4','Structural Blindness')])
-    answer_type = SelectField("Answer Input Type", validators=[DataRequired()], choices=[('0','Text'),('1', 'Highlight')])
+    answer_type = SelectField("Answer Input Type", validators=[DataRequired()], choices=[('0','Text'),('1', 'Highlight'), ('2', 'Select')])
 class CreateAssignment(FlaskForm):
     number_of_questions = IntegerField("Number of Questions", validators=[DataRequired()])
     questions = FieldList( FormField(QuestionForm), min_entries=1)
@@ -38,4 +38,9 @@ class Submit(FlaskForm):
     answers = FieldList(StringField("Answer", validators=[DataRequired()]), min_entries=0)
     answer_logs = FieldList(StringField("History", render_kw={"hidden":True}), min_entries=0)
     submit = SubmitField("Submit Assignment")
+
+#  lookup submissions for a student
+class Search(FlaskForm):
+    student_id = StringField("Student ID", validators=[DataRequired()])
+    assignment_id = StringField("Assignment ID", validators=[DataRequired()])
 

@@ -1,2 +1,60 @@
 {% extends "base.html" %}
 
+{% if view == true %}
+    <h1>Assignment {{ assignment_id }}</h1>
+
+    <h3>Submission</h3>
+    <div class= questionid="submissionViewBox">
+        {% for question in questions %}
+        <div class="questionGroup">
+            <p class="question">
+                    {{ question.question}}
+            </p>
+            <p class="erroneousAnswer">
+                    {{question.erroneousAnswer}}
+            </p>
+            <p class="expected">
+                    {{question.error_class}}
+            </p>
+            <p class="comment">
+
+            </p>
+            <p class="answer">
+                    {{question.answer}}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3> Revisions </h3>
+    <div id="revisionsViewBox">
+        {% for revision in revisions %}
+            <div class="revisionViewBox">
+                <h5>Revision {{ loop.index }}</h5>
+                <p class="question">
+                    {{ question.question}}
+                </p>
+                <p class="erroneousAnswer">
+                    {{question.erroneousAnswer}}
+                </p>
+                <p class="expected">
+                    {{question.error_class}}
+                </p>
+                <p class="answer">
+                    {{question.answer}}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if view == false %}
+    <h3> View Submissions </h3>
+    <form class="lookup">
+        {{lookup.student_id.label}}
+        {{lookup.student_id()}}
+        {{lookup.assignment_id.label}}
+        {{lookup.assignment_id()}}
+        {{lookup.submit()}}
+    </form>
+{%endif%}

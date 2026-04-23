@@ -6,7 +6,9 @@
         <meta name = "viewport" content="width=device-width, initial-scale=1.0">  
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
         {#<!--  <link rel="stylesheet" href="../static/css/styles.css"> -->#}
-    {% endblock %}
+        <script src="{{ url_for('static', filename='js/navbar.js') }}" defer></script>
+
+        {% endblock %}
     {% block extraHeaders %}
         {# extra headers #}
     {% endblock%}
@@ -15,20 +17,28 @@
         <nav>
             <ul>
                 <li>
-                    <a href="login">Login</a>
-                    <a href="./assign">Assign</a>
-                    <a href="./submit-assignment/">
+                    <a href="{{url_for('home')}}">
+                        Login
+                    </a>
+                    <a href="{{url_for('create_questions')}}">
+                        Assign
+                    </a>
+                    <a href="{{url_for('submit_answers', assignment_id=0)}}">
                         Submit Assignment
-                        <input type="number" class="inline">
                     </a>
-                    <a href="./revise/"> 
+                    <input type="number" id="submitNumber"class="inline">
+                    <a href="{{url_for('revise', assignment_id=0)}}"> 
                         Revise
-                        <input type="number" class="inline">
                     </a>
-                    <a href="./share/">
+                    <input type="number" id="reviseNumber"class="inline">
+                    <a href="{{url_for('share', assignment_id=0)}}">
                         Share
-                        <input type="number" class="inline">
                     </a>
+                    <input type="number" id="shareNumber"class="inline">
+                    <a href="{{url_for('view')}}">
+                        View
+                    </a>
+                    {#<!-- <input type="number" id="viewNumber"class="inline"> -->#}
                 </li>
             </ul>
         </nav>

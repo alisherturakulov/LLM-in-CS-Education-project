@@ -32,6 +32,7 @@ body {
     background-color: #f3f4f6; /* Soft light gray background */
     color: #1f2937; /* Dark gray for high contrast text */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -76,7 +77,7 @@ p.question {
     line-height: 1.4;
 }
 
-p.erraneousAnswer {
+p.erroneousAnswer {
     font-size: 1rem;
     font-weight: 500;
     color: #142734;
@@ -122,21 +123,24 @@ p.comment {
     color: #9ca3af;
 }
 
+/* navigation bar styling */
 nav {
-    border-bottom: solid 1px;
-    display:inline-block;
-    
+    border-bottom: solid 1px;    
 }
 
 nav ul {
     list-style-type:none ;
     display: inline-flex;
-    
+    display:inline-block;
 }
 
 nav ul li a {   
         color:#142734;
         text-decoration: none;
+}
+
+nav ul li {
+     margin-right: 3px;
 }
 
 input.inline {
