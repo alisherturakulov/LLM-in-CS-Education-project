@@ -62,25 +62,37 @@ def generateGemini(prompt, model="gemini-2.0-flash"):#gemini-2.5-flash-lite
     return response.text
 
 #generate OpenAI response using some model in response to some user content and system_prompt
-def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high"):
-  if model == "o3-mini":
-    completion = clientOpenAI.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content}
-        ],
-        reasoning_effort=reasoning_effort
-    )
-  else:
+def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high", use_openai=True):
+  completion = "<LLM API completion>"
+  if(use_openai):
+    if model == "o3-mini":
       completion = clientOpenAI.chat.completions.create(
           model=model,
-          temperature= temperature,
           messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content}
+              {"role": "system", "content": system_prompt},
+              {"role": "user", "content": content}
           ],
-    )
+          reasoning_effort=reasoning_effort
+      )
+    else:
+        completion = clientOpenAI.chat.completions.create(
+            model=model,
+            temperature= temperature,
+            messages=[
+              {"role": "system", "content": system_prompt},
+              {"role": "user", "content": content}
+            ],
+      )
+  else:
+    completion = "<Gemini API completion>"
+    try:
+      response = client.models.generate_content(
+        model="gemini-2.5-flash-lite", 
+        contents=f"System instructions: {system_prompt}; User prompt: {content}"
+      )
+      completion = response
+    except Exception as e:
+      completion = e
   return completion
 
 ###################text instructions
@@ -403,11 +415,12 @@ def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', u
     prev = prior_answers[i] if i < len(prior_answers) else None
     # build prompt
     prompt = f"Question: {item['question']}\n"
-    prompt += f"Original (erroneous) solution: {item['erroneous']}\n"
-    prompt += f"Expected error type (index): {item['expected']}\n"
+    prompt += f"Original (erroneous) solution which the student was supposed to identify the error in: {item['erroneous']}\n"
+    prompt += f"Expected error type (index) student should identify in the erroneous solution: {item['expected']}\n"
+    prompt += f"Types of errors: {system_prompt_generate1[system_prompt_generate1.index("1."):]}\n"
     prompt += f"Student's revised answer: {student_answer or '[no answer]'}\n"
     if prev:
-      prompt += f"Previous attempt: {prev}\n"
+      prompt += f"Previous attempt at finding the error in the erroneous solution: {prev}\n"
       prompt += "Compare the previous attempt with the student's revised answer and give concise, specific feedback focused on what changed, what remains wrong (if anything), and one actionable suggestion to improve.\n"
     else:
       prompt += "Give concise, specific feedback identifying the error in the original solution and one actionable suggestion for the student to revise their answer (if revision necessary).\n"
