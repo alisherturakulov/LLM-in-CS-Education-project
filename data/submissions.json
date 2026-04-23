@@ -5,6 +5,7 @@
             "questions": [
                 {
                     "question": "<question text>",
+                    "error answers": ["<first error answer which was originally generated in the subimt route to be identified>"],
                     "answers": [
                         "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
                     ],
@@ -20,6 +21,7 @@
                 },
                 {
                     "question": "<question text>",
+                    "error answers": [],
                     "answers": [
                         "<first answer string; select type inputs have the selected error type entered here>",
                         "<second answer string; select type inputs have the selected error type entered here>"
@@ -45,6 +47,7 @@
                     "questions": [
                         {
                             "question": "<question text>",
+                            "error answers": [],
                             "answers": [
                                 "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"                            ],
                             "expected": [
@@ -62,6 +65,7 @@
                         },
                         {
                             "question": "<question text>",
+                            "error answers": [],
                             "answers": [
                                 "<first answer string; select type inputs have the selected error type entered here>",
                                 "<second answer string; select type inputs have the selected error type entered here>"

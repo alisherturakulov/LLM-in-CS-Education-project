@@ -177,20 +177,20 @@ def share(assignment_id):#index from assignments list
     host = request.host_url
     return render_template("share.html", assignment_id= assignment_id, host_url=request.host_url) or render_template_string("will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>")
 
-@app.route("/submissions/<int:assignment_id>")
-def submissions(assignment_id):
-    #submissions json
-    results = ""
-    submissions = loadJSON("submissions.json")
-    assignments = loadJSON("assignments.json")
-    if not isValidAssignment(assignments, assignment_id):
-        print("error: incorrect assignment_id in /submit")
-        #raise IndexError("Incorrect assignment_id")
-        return render_template("error.html", error_message="Error code 500 incorrect assignment id")
-    for student_id in submissions[assignment_id].keys():
-            results+= f"\nStudent_id {student_id}:\n{submissions[assignment_id][student_id]}"
-            results+= "\n"
-    return render_template_string(results)
+# @app.route("/submissions/<int:assignment_id>")
+# def submissions(assignment_id):
+#     #submissions json
+#     results = ""
+#     submissions = loadJSON("submissions.json")
+#     assignments = loadJSON("assignments.json")
+#     if not isValidAssignment(assignments, assignment_id):
+#         print("error: incorrect assignment_id in /submit")
+#         #raise IndexError("Incorrect assignment_id")
+#         return render_template("error.html", error_message="Error code 500 incorrect assignment id")
+#     for student_id in submissions[assignment_id].keys():
+#             results+= f"\nStudent_id {student_id}:\n{submissions[assignment_id][student_id]}"
+#             results+= "\n"
+#     return render_template_string(results)
 
 @app.route("/revise/<int:assignment_id>", methods=['GET', 'POST'])
 def revise(assignment_id):
@@ -342,13 +342,75 @@ def revise(assignment_id):
 @app.route('/view', methods=['GET', 'POST'])
 def view():
     search_form = Search()
-    if(search_form.validate_on_submit()):
+    if search_form.validate_on_submit():
         student_id = search_form.student_id.data
         assignment_id = search_form.assignment_id.data
 
-        return render_template("view.html", view=True, questions=questions, revisions=revisions)
+        # load the student's submissions file (falls back to base submissions.json)
+        student_submissions = loadJSON("submissions.json", student_id) or {}
+        #print(student_submissions)
+        # entry may be nested as { assignment_id: { student_id: entry } }
+        entry = {}
+        try:
+            entry = student_submissions.get(str(assignment_id), {}).get(str(student_id))
+        except Exception:
+            entry = None
 
-    return render_template("view.html", view=False, lookup = search_form)
+        if not entry:
+            return render_template("view.html", view=False, lookup=search_form)
+
+        # normalize questions into a flat list suitable for the template
+        flat_questions = []
+        qlist = []
+        if isinstance(entry.get('questions'), list):
+            qlist = entry.get('questions')
+        else:
+            qlist = [{
+                'question': entry.get('question',''),
+                'error answers': entry.get('error answers', []),
+                'answers': entry.get('answers', []),
+                'expected': entry.get('expected', []),
+            }]
+
+        for q in qlist:
+            answers = q.get('answers', [])
+            expected = q.get('expected', [])
+            error_answers = q.get('error answers', [])
+            maxlen = max(len(answers), len(expected), len(error_answers))
+            for i in range(maxlen):
+                flat_questions.append({
+                    'question': q.get('question','') if i == 0 else '',
+                    'erroneousAnswer': error_answers[i] if i < len(error_answers) else '',
+                    'error_class': expected[i] if i < len(expected) else '',
+                    'answer': answers[i] if i < len(answers) else '',
+                })
+
+        # normalize revisions similarly
+        flat_revisions = []
+        for rev in entry.get('revisions', []) if isinstance(entry.get('revisions', []), list) else []:
+            # revision may be a per-question dict or contain 'questions' list
+            if isinstance(rev, dict) and 'question' in rev:
+                for i, ans in enumerate(rev.get('answers', [])):
+                    flat_revisions.append({
+                        'question': rev.get('question',''),
+                        'erroneousAnswer': rev.get('error answers', [])[i] if i < len(rev.get('error answers', [])) else '',
+                        'error_class': rev.get('expected', [])[i] if i < len(rev.get('expected', [])) else '',
+                        'answer': ans,
+                        'comment': rev.get('comments', [])[i] if i < len(rev.get('comments', [])) else ''
+                    })
+            elif isinstance(rev, dict) and 'questions' in rev:
+                for q in rev.get('questions', []):
+                    for i, ans in enumerate(q.get('answers', [])):
+                        flat_revisions.append({
+                            'question': q.get('question',''),
+                            'erroneousAnswer': q.get('error answers', [])[i] if i < len(q.get('error answers', [])) else '',
+                            'error_class': q.get('expected', [])[i] if i < len(q.get('expected', [])) else '',
+                            'answer': ans,
+                            'comment': q.get('comments', [])[i] if i < len(q.get('comments', [])) else ''
+                        })
+
+        return render_template('view.html', view=True, assignment_id=assignment_id, questions=flat_questions, revisions=flat_revisions)
+    return render_template('view.html', view=False, lookup=search_form, assignment_id=None, questions=None, revisions=None)
 
 def isValidAssignment(assignments: list, assignment_id: int):
     return isinstance(assignments, list) and assignment_id < len(assignments) and assignment_id >= 0
@@ -478,6 +540,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                 if 'questions' not in existing and any(k in existing for k in ('question','answers')):
                     qobj = {
                         'question': existing.get('question',''),
+                        'error answers': exisiting.get('error answers', []),
                         'answers': existing.get('answers',[]),
                         'expected': existing.get('expected',[]),
                         'answer history': existing.get('answer history',[])
@@ -487,6 +550,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                 # append new question entry
                 qentry = {
                     'question': dataToAdd.get('question',''),
+                    'error answers': dataToAdd.get('error answers', []),
                     'answers': dataToAdd.get('answers',[]),
                     'expected': dataToAdd.get('expected',[]),
                     'answer history': dataToAdd.get('answer history',[])
@@ -498,6 +562,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                     'name': dataToAdd.get('name',''),
                     'questions': [{
                         'question': dataToAdd.get('question',''),
+                        'error answers': dataToAdd.get('error answers',[]),
                         'answers': dataToAdd.get('answers',[]),
                         'expected': dataToAdd.get('expected',[]),
                         'answer history': dataToAdd.get('answer history',[])
@@ -516,7 +581,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
     return dataLength
 
 
-def loadJSON(dataFileName, student_id: int = None, assignment_id = None):
+def loadJSON(dataFileName, student_id = None, assignment_id = None):
     """Load a JSON file from data/ or data/students/<student_id>/ when student_id provided."""
     current_filepath = os.path.dirname(__file__)
     base_path = os.path.join(current_filepath, os.pardir, "data")

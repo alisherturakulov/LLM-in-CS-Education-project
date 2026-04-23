@@ -37,13 +37,13 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 20px;
-    flex-wrap:wrap;
+    /* flex-wrap:wrap; */
 }
 
 /* =========================================
    Container Styles
    ========================================= */
-form {
+form, #submissionViewBox, #revisionsViewBox {
     background-color: #ffffff;
     width: 100%;
     max-width: 600px;
@@ -77,7 +77,7 @@ p.question {
     line-height: 1.4;
 }
 
-p.erroneousAnswer {
+p.erroneousAnswer, p.expected, p.answer {
     font-size: 1rem;
     font-weight: 500;
     color: #142734;

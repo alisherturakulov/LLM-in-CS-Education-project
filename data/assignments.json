@@ -301,5 +301,25 @@
                 "0"
             ]
         }
+    ],
+    [
+        {
+            "question": "how many sides does a triangle have?",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ]
+        },
+        {
+            "question": "What is the length of a diagonal of a square with side length 2?",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ]
+        }
     ]
 ]

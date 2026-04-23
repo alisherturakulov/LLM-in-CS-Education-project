@@ -43,4 +43,4 @@ class Submit(FlaskForm):
 class Search(FlaskForm):
     student_id = StringField("Student ID", validators=[DataRequired()])
     assignment_id = StringField("Assignment ID", validators=[DataRequired()])
-
+    submit = SubmitField("Find Submission")
