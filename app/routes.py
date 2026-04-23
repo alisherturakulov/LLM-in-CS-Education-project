@@ -1,8 +1,8 @@
 #routing for flask project
 from app import app
 from flask import render_template, request, redirect, render_template_string, url_for
-from app.pipeline import check_answer, generate_questions, check_answers
-from app.forms import Login, Signup, CreateAssignment, Submit
+from app.pipeline import generate_questions, check_answers
+from app.forms import Login, Signup, CreateAssignment, Submit, Search
 import os, json
 #import db from module where initialized, use data folder json for now
 
@@ -19,8 +19,8 @@ idx = 0
 #     "error classes":[],
 # }}
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+# @app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def home():
     #check db for authentication
     login_form = Login()
@@ -41,7 +41,7 @@ def home():
     
     return render_template('login.html', login_form=login_form, signup_form=signup_form)
 
-
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/assign', methods=['GET','POST'])
 def create_questions():
     assign_form = CreateAssignment()
@@ -64,7 +64,7 @@ def create_questions():
         newLength = addToJSON(generated_error_questions, "assignments.json")
         # questions = generate_questions(number_of_qs)
         if (newLength <= 0):
-            return render_template_string("Error 500: in create, error appending assignment")
+            return render_template("error.html", error_message="Error 500: in create, error appending assignment")
         #to jsonify and pass into template
         #put questions json into new assignment in assignments table of current instructor
         
@@ -89,7 +89,7 @@ def submit_answers(assignment_id):
     else:
         print("error: incorrect assignment_id in /submit")
         #raise IndexError("Incorrect assignment_id")
-        return render_template_string("Error code 500 incorrect assignment id")
+        return render_template("error.html", error_message="Error code 500 incorrect assignment id")
     
     if(submit_form.validate_on_submit()):
         student_name = submit_form.student_name.data
@@ -132,7 +132,7 @@ def submit_answers(assignment_id):
             saved = student_submissions.get(str(assignment_id), {}).get(str(student_id))
         except Exception:
             saved = None
-        return render_template_string(f"Successfully submitted! Saved: \n{saved}")
+        return render_template("success.html", success_message=f"Successfully submitted! Saved: \n{saved}")
         #feedback = check_answers(answers)
     #create a list of generated answers
     comments = []
@@ -172,7 +172,7 @@ def share(assignment_id):#index from assignments list
     else:
         print("error: incorrect assignment_id in /submit")
         #raise IndexError("Incorrect assignment_id")
-        return render_template_string("Error code 500 incorrect assignment id")
+        return render_template("error.html", error_message="Error code 500 incorrect assignment id")
     #assignment = assignments[assignment_id]
     host = request.host_url
     return render_template("share.html", assignment_id= assignment_id, host_url=request.host_url) or render_template_string("will display assignments list, and redirect to a chosen submit-assignment/<int:assignment_index_in_list>")
@@ -186,20 +186,19 @@ def submissions(assignment_id):
     if not isValidAssignment(assignments, assignment_id):
         print("error: incorrect assignment_id in /submit")
         #raise IndexError("Incorrect assignment_id")
-        return render_template_string("Error code 500 incorrect assignment id")
+        return render_template("error.html", error_message="Error code 500 incorrect assignment id")
     for student_id in submissions[assignment_id].keys():
             results+= f"\nStudent_id {student_id}:\n{submissions[assignment_id][student_id]}"
             results+= "\n"
     return render_template_string(results)
 
-@app.route("/revise/<int:assignment_id>/<int:revision>", methods=['GET', 'POST'])
-def revise(assignment_id, revision):
+@app.route("/revise/<int:assignment_id>", methods=['GET', 'POST'])
+def revise(assignment_id):
     submit_form = Submit()
     # load assignments and validate
     assignments = loadJSON("assignments.json")
     if not isValidAssignment(assignments, assignment_id):
-        return render_template_string("Error code 500 incorrect assignment id")
-
+        return render_template("error.html", error_message="Error code 500 incorrect assignment id")
     current_assignment_dict = assignments[assignment_id]
 
     # If a student_id is provided in query params, load their latest revisions/comments for display
@@ -340,6 +339,17 @@ def revise(assignment_id, revision):
     comments = ["(No comments yet)"] * len(erroneous_solutions)
     return render_template("revise.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs, comments))
 
+@app.route('/view', methods=['GET', 'POST'])
+def view():
+    search_form = Search()
+    if(search_form.validate_on_submit()):
+        student_id = search_form.student_id.data
+        assignment_id = search_form.assignment_id.data
+
+        return render_template("view.html", view=True, questions=questions, revisions=revisions)
+
+    return render_template("view.html", view=False, lookup = search_form)
+
 def isValidAssignment(assignments: list, assignment_id: int):
     return isinstance(assignments, list) and assignment_id < len(assignments) and assignment_id >= 0
 
@@ -472,7 +482,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                         'expected': existing.get('expected',[]),
                         'answer history': existing.get('answer history',[])
                     }
-                    existing = {'name': existing.get('name',''), 'questions':[qobj], 'revisions': existing.get('revisions',{})}
+                    existing = {'name': existing.get('name',''), 'questions':[qobj], 'revisions': existing.get('revisions',[])}
                     student_map[sid] = existing
                 # append new question entry
                 qentry = {
@@ -492,7 +502,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                         'expected': dataToAdd.get('expected',[]),
                         'answer history': dataToAdd.get('answer history',[])
                     }],
-                    'revisions': {}
+                    'revisions': []
                 }
             dataLength = len(dataObject)
 
@@ -506,7 +516,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
     return dataLength
 
 
-def loadJSON(dataFileName, student_id: int = None):
+def loadJSON(dataFileName, student_id: int = None, assignment_id = None):
     """Load a JSON file from data/ or data/students/<student_id>/ when student_id provided."""
     current_filepath = os.path.dirname(__file__)
     base_path = os.path.join(current_filepath, os.pardir, "data")
@@ -520,6 +530,9 @@ def loadJSON(dataFileName, student_id: int = None):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             dataObject = json.load(f)
+            if(assignment_id != None):
+                #if assignment_id is specified return the assignment dictionary
+                dataObject = dataObject.get(assignment_id, {})
             return dataObject
     except Exception as e:
         print(e)

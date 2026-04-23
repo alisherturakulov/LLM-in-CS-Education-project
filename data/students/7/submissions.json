@@ -1,0 +1,504 @@
+{
+    "assignment_id": {
+        "student_id": {
+            "name": "",
+            "questions": [
+                {
+                    "question": "<question text>",
+                    "answers": [
+                        "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
+                    ],
+                    "expected": [
+                        "<expected error type of first answer>"
+                    ],
+                    "answer history": [
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        }
+                    ]
+                },
+                {
+                    "question": "<question text>",
+                    "answers": [
+                        "<first answer string; select type inputs have the selected error type entered here>",
+                        "<second answer string; select type inputs have the selected error type entered here>"
+                    ],
+                    "expected": [
+                        "<expected error type of first answer>",
+                        "<expected erorr type of second answer>"
+                    ],
+                    "answer history": [
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        },
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        }
+                    ]
+                }
+            ],
+            "revisions": [
+                {
+                    "questions": [
+                        {
+                            "question": "<question text>",
+                            "answers": [
+                                "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
+                            ],
+                            "expected": [
+                                "<expected error type of first answer>"
+                            ],
+                            "comments": [
+                                "<comments from model go here>"
+                            ],
+                            "answer history": [
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                }
+                            ]
+                        },
+                        {
+                            "question": "<question text>",
+                            "answers": [
+                                "<first answer string; select type inputs have the selected error type entered here>",
+                                "<second answer string; select type inputs have the selected error type entered here>"
+                            ],
+                            "expected": [
+                                "<expected error type of first answer>",
+                                "<expected erorr type of second answer>"
+                            ],
+                            "comments": [
+                                ""
+                            ],
+                            "answer history": [
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                },
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "13": {
+        "7": {
+            "name": "Ali",
+            "questions": [
+                {
+                    "question": "this is question one",
+                    "answers": [
+                        "Here is the answer to question one"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        [
+                            {
+                                "4/20/2026, 5:35:30 PM": "Here is the answer to question one"
+                            }
+                        ]
+                    ]
+                },
+                {
+                    "question": "Here is question two",
+                    "answers": [
+                        "Here is the answer to question 2.1",
+                        "Here is question 2.2's answer",
+                        "Here is the answer to question 2.3, not 3.1"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2"
+                    ],
+                    "answer history": [
+                        [
+                            {
+                                "4/20/2026, 5:35:43 PM": "Here is the answer to question three"
+                            },
+                            {
+                                "4/20/2026, 5:35:57 PM": "Here is the answer to question 2.1"
+                            }
+                        ],
+                        [
+                            {
+                                "4/20/2026, 5:35:48 PM": "Here is question fours answer"
+                            },
+                            {
+                                "4/20/2026, 5:36:04 PM": "Here is question 2.2s answer"
+                            },
+                            {
+                                "4/20/2026, 5:36:11 PM": "Here is question 2.2's answer"
+                            }
+                        ],
+                        [
+                            {
+                                "4/20/2026, 5:36:25 PM": "Here is the answer to question 3.1"
+                            },
+                            {
+                                "4/20/2026, 5:36:38 PM": "Here is the answer to question 2.3, not 3.1"
+                            }
+                        ]
+                    ]
+                },
+                {
+                    "question": "Written is question three",
+                    "answers": [
+                        "generated solution goes here;",
+                        "uncomment pipeline call first",
+                        "3.3 in the middle",
+                        "3.4 here",
+                        "3.5 lastly"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "answer history": [
+                        [],
+                        [],
+                        [
+                            {
+                                "4/20/2026, 5:37:26 PM": "3.3 here"
+                            },
+                            {
+                                "4/20/2026, 5:37:43 PM": "3.3 in the middle"
+                            }
+                        ],
+                        [
+                            {
+                                "4/20/2026, 5:37:19 PM": "3.4 here"
+                            }
+                        ],
+                        [
+                            {
+                                "4/20/2026, 5:37:22 PM": "3.5 here"
+                            },
+                            {
+                                "4/20/2026, 5:37:34 PM": "3.5 lastly"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "revisions": [
+                {
+                    "name": "Ali",
+                    "question": "this is question one",
+                    "answers": [
+                        "This is where the solution goes g generated solution goes here"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:52:26 PM : This is where the solution goes g;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "Here is question two",
+                    "answers": [
+                        "2.1 revised",
+                        "2.2 revised",
+                        "2.3 revised"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:52:45 PM : 2.2 revised;4/20/2026, 5:52:59 PM : 2.1 revised;",
+                        "4/20/2026, 5:52:50 PM : 2.3 revised;4/20/2026, 5:53:01 PM : 2.2 revised;",
+                        "4/20/2026, 5:52:53 PM : 2.;4/20/2026, 5:53:11 PM : 2.3 revised;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "Written is question three",
+                    "answers": [
+                        "3.1 revision",
+                        "3.2's revision",
+                        "3.3's revision",
+                        "3.4's revision",
+                        "3.5 revision"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:53:18 PM : 3.1 revision;",
+                        "4/20/2026, 5:53:22 PM : 3.2's revision;",
+                        "4/20/2026, 5:53:25 PM : 3.3's revision;",
+                        "4/20/2026, 5:53:31 PM : 3.4's revision;",
+                        ""
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "this is question one",
+                    "answers": [
+                        "This is where the solution goes g generated solution goes here"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:52:26 PM : This is where the solution goes g;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "Here is question two",
+                    "answers": [
+                        "2.1 revised",
+                        "2.2 revised",
+                        "2.3 revised"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:52:45 PM : 2.2 revised;4/20/2026, 5:52:59 PM : 2.1 revised;",
+                        "4/20/2026, 5:52:50 PM : 2.3 revised;4/20/2026, 5:53:01 PM : 2.2 revised;",
+                        "4/20/2026, 5:52:53 PM : 2.;4/20/2026, 5:53:11 PM : 2.3 revised;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "Written is question three",
+                    "answers": [
+                        "3.1 revision",
+                        "3.2's revision",
+                        "3.3's revision",
+                        "3.4's revision",
+                        "3.5 revision"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "answer history": [
+                        "4/20/2026, 5:53:18 PM : 3.1 revision;",
+                        "4/20/2026, 5:53:22 PM : 3.2's revision;",
+                        "4/20/2026, 5:53:25 PM : 3.3's revision;",
+                        "4/20/2026, 5:53:31 PM : 3.4's revision;",
+                        "4/20/2026, 5:53:34 PM : 3.5 revision;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                }
+            ]
+        }
+    },
+    "14": {
+        "7": {
+            "name": "Ali",
+            "questions": [
+                {
+                    "question": "How many sides does a square have?",
+                    "answers": [
+                        "four sides, but the erroneous answer doesn't mention this; wrong choice error"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        [
+                            {
+                                "4/22/2026, 6:49:16 PM": "four"
+                            },
+                            {
+                                "4/22/2026, 6:51:13 PM": "four sides, but the erroneous answer doesn't mention this"
+                            },
+                            {
+                                "4/22/2026, 6:53:10 PM": "four sides, but the erroneous answer doesn't mention this"
+                            },
+                            {
+                                "": "wrong choice"
+                            },
+                            {
+                                "4/22/2026, 6:53:18 PM": "four sides, but the erroneous answer doesn't mention this"
+                            },
+                            {
+                                "": "wrong choice error"
+                            }
+                        ]
+                    ]
+                },
+                {
+                    "question": "What is the length of a rectangle's diagonal?",
+                    "answers": [
+                        "the value of c in the Pythagorean theorem with the two adjacent side lengths substituted for the a and b values. This is a knowledge gap error since the answer mentions nothing related to the sides or the formula."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        [
+                            {
+                                "4/22/2026, 6:52:48 PM": "the value of c in the Pythagorean theorem with the two adjacent side lengths substituted for the a and b values"
+                            },
+                            {
+                                "4/22/2026, 6:53:00 PM": "the value of c in the Pythagorean theorem with the two adjacent side lengths substituted for the a and b values,"
+                            },
+                            {
+                                "4/22/2026, 6:54:12 PM": "the value of c in the Pythagorean theorem with the two adjacent side lengths substituted for the a and b values. This is a knowledge gap error since the answer mentions nothing related to the sides or the formula."
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "revisions": [
+                {
+                    "name": "Ali",
+                    "question": "How many sides does a square have?",
+                    "answers": [
+                        "This is a knowledge gap error; the answer doesn't mention anything relevant and is wrong. So there must be a knowledge gap causing this."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 6:56:17 PM : This is a knowledge gap error; the answer doesn't mention anything relevant and is wrong. So there must be a knowledge gap causing this ;4/22/2026, 6:56:24 PM : This is a knowledge gap error; the answer doesn't mention anything relevant and is wrong. So there must be a knowledge gap causing this.;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "What is the length of a rectangle's diagonal?",
+                    "answers": [
+                        "This is a misconception error, because the answerer didn't answer the question but stated that their wrong answer is wrong."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 6:56:29 PM : ;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "How many sides does a square have?",
+                    "answers": [
+                        "I think this is a knowledge gap error; the answer doesn't mention anything relevant and is wrong. So there must be a knowledge gap causing this."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        ""
+                    ],
+                    "comments": [
+                        "Your revised answer correctly identifies the error type as a knowledge gap. However, you haven't actually answered the original question. To improve, recall the definition of a square and state the number of sides it has."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "What is the length of a rectangle's diagonal?",
+                    "answers": [
+                        "I believe this is a misconception error, because the answerer didn't answer the question but stated that their wrong answer is wrong."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        ""
+                    ],
+                    "comments": [
+                        "Your revised answer still focuses on categorizing the error rather than providing the length of the diagonal. While you've correctly identified that the original response was not a valid answer, you need to address the core mathematical question. For your next revision, attempt to calculate and state the actual length of the diagonal."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "How many sides does a square have?",
+                    "answers": [
+                        "The answer doesn't address the question, it is a knwoledge gap, since the answerer didn't include relevant info or answer. A square has 4 sides."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 8:13:47 PM : The answer doesn't address the question, it is a knwoledge gap, since the answerer didn't include relevant info or answer. A square has 4 sides.;"
+                    ],
+                    "comments": [
+                        "Your revised answer correctly identifies that a square has 4 sides, which is a great improvement from your previous attempt that didn't answer the question. However, the response still includes extraneous commentary about \"knowledge gaps.\" For your next revision, please focus solely on stating the number of sides a square has."
+                    ]
+                },
+                {
+                    "name": "Ali",
+                    "question": "What is the length of a rectangle's diagonal?",
+                    "answers": [
+                        "The answer given is self-aware, calling itself erroneous but it represents a knowledge gap since the answerer didn't  address the question. A rectangles diagnol's length equals the square root of the sum of the squares of its longer and shorter side lengths. Here I am not given the lengths so this is a formula to use."
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 8:13:49 PM : This;4/22/2026, 8:15:52 PM : The answer given is self aware, calling itself erroneous but it represents a knowledge gap since the answerer didn't  address the question. A rectangles diagnol's length equals the square root of the sum of the squares of its longer and shorter side lengths. Here I am not given the ;4/22/2026, 8:16:32 PM : The answer given is self aware, calling itself erroneous but it represents a knowledge gap since the answerer didn't  address the question. A rectangles diagnol's length equals the square root of the sum of the squares of its longer and shorter side lengths. Here I am not given the lengths so this is a formula to use.;4/22/2026, 8:16:38 PM : The answer given is self-aware, calling itself erroneous but it represents a knowledge gap since the answerer didn't  address the question. A rectangles diagnol's length equals the square root of the sum of the squares of its longer and shorter side lengths. Here I am not given the lengths so this is a formula to use.;"
+                    ],
+                    "comments": [
+                        "Your revised answer correctly identifies that the diagonal's length depends on the rectangle's side lengths and provides the correct formula. However, the question asks for the *length* of the diagonal, implying a numerical answer. Next, try to find a specific rectangle to apply the formula to."
+                    ]
+                }
+            ]
+        }
+    }
+}

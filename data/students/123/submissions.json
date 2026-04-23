@@ -4,16 +4,38 @@
             "name": "",
             "questions": [
                 {
-                    "question": "",
+                    "question": "<question text>",
                     "answers": [
-                        ""
+                        "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
                     ],
                     "expected": [
-                        ""
+                        "<expected error type of first answer>"
                     ],
                     "answer history": [
                         {
-                            "<time>": "<input>"
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        }
+                    ]
+                },
+                {
+                    "question": "<question text>",
+                    "answers": [
+                        "<first answer string; select type inputs have the selected error type entered here>",
+                        "<second answer string; select type inputs have the selected error type entered here>"
+                    ],
+                    "expected": [
+                        "<expected error type of first answer>",
+                        "<expected erorr type of second answer>"
+                    ],
+                    "answer history": [
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        },
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
                         }
                     ]
                 }
@@ -22,19 +44,43 @@
                 {
                     "questions": [
                         {
-                            "question": "",
+                            "question": "<question text>",
                             "answers": [
-                                ""
+                                "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"                            ],
+                            "expected": [
+                                "<expected error type of first answer>"
+                            ],
+                            "comments": [
+                                "<comments from model go here>"
+                            ],
+                            "answer history": [
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                }
+                            ]
+                        },
+                        {
+                            "question": "<question text>",
+                            "answers": [
+                                "<first answer string; select type inputs have the selected error type entered here>",
+                                "<second answer string; select type inputs have the selected error type entered here>"
                             ],
                             "expected": [
-                                ""
+                                "<expected error type of first answer>",
+                                "<expected erorr type of second answer>"
                             ],
                             "comments": [
                                 ""
                             ],
                             "answer history": [
                                 {
-                                    "<time>": "<input>"
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                },
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
                                 }
                             ]
                         }
@@ -513,6 +559,74 @@
                         "4/17/2026, 1:01:19 PM : a31;",
                         "4/17/2026, 1:01:22 PM : a32;",
                         "4/17/2026, 1:01:26 PM : a33;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                }
+            ]
+        }
+    },
+    "1": {
+        "123": {
+            "name": "bob",
+            "questions": [],
+            "revisions": [
+                {
+                    "name": "bob",
+                    "question": "q1",
+                    "answers": [
+                        "revised 1.1"
+                    ],
+                    "expected": [
+                        "0"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 5:30:19 PM : revised 1.1;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "bob",
+                    "question": "q2",
+                    "answers": [
+                        "revised 2.1 generated solution",
+                        "revised 2.2"
+                    ],
+                    "expected": [
+                        "0",
+                        "1"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 5:30:23 PM : revised 2.1;4/22/2026, 5:30:51 PM : revised 2.1 generated solution;",
+                        "4/22/2026, 5:30:28 PM : revised 2.2;"
+                    ],
+                    "comments": [
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",
+                        "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                    ]
+                },
+                {
+                    "name": "bob",
+                    "question": "q3",
+                    "answers": [
+                        "revised 3.1",
+                        "revised 3.2",
+                        "revised 3.3"
+                    ],
+                    "expected": [
+                        "0",
+                        "1",
+                        "2"
+                    ],
+                    "answer history": [
+                        "4/22/2026, 5:30:33 PM : revised 3.1;",
+                        "4/22/2026, 5:30:37 PM : revised 3.2;",
+                        "4/22/2026, 5:30:40 PM : revised 3.3;"
                     ],
                     "comments": [
                         "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.",

@@ -4,16 +4,38 @@
             "name": "",
             "questions": [
                 {
-                    "question": "",
+                    "question": "<question text>",
                     "answers": [
-                        ""
+                        "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
                     ],
                     "expected": [
-                        ""
+                        "<expected error type of first answer>"
                     ],
                     "answer history": [
                         {
-                            "<time>": "<input>"
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        }
+                    ]
+                },
+                {
+                    "question": "<question text>",
+                    "answers": [
+                        "<first answer string; select type inputs have the selected error type entered here>",
+                        "<second answer string; select type inputs have the selected error type entered here>"
+                    ],
+                    "expected": [
+                        "<expected error type of first answer>",
+                        "<expected erorr type of second answer>"
+                    ],
+                    "answer history": [
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
+                        },
+                        {
+                            "<time>": "<input>",
+                            "<time2>": "<input>"
                         }
                     ]
                 }
@@ -22,19 +44,43 @@
                 {
                     "questions": [
                         {
-                            "question": "",
+                            "question": "<question text>",
                             "answers": [
-                                ""
+                                "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"                            ],
+                            "expected": [
+                                "<expected error type of first answer>"
+                            ],
+                            "comments": [
+                                "<comments from model go here>"
+                            ],
+                            "answer history": [
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                }
+                            ]
+                        },
+                        {
+                            "question": "<question text>",
+                            "answers": [
+                                "<first answer string; select type inputs have the selected error type entered here>",
+                                "<second answer string; select type inputs have the selected error type entered here>"
                             ],
                             "expected": [
-                                ""
+                                "<expected error type of first answer>",
+                                "<expected erorr type of second answer>"
                             ],
                             "comments": [
                                 ""
                             ],
                             "answer history": [
                                 {
-                                    "<time>": "<input>"
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
+                                },
+                                {
+                                    "<time>": "<input>",
+                                    "<time2>": "<input>"
                                 }
                             ]
                         }

@@ -281,5 +281,25 @@
                 "4"
             ]
         }
+    ],
+    [
+        {
+            "question": "How many sides does a square have?",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ]
+        },
+        {
+            "question": "What is the length of a rectangle's diagonal?",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ]
+        }
     ]
 ]

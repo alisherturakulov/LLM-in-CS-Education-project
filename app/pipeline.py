@@ -17,11 +17,12 @@ os.getenv('GEMINI_API_KEY')
 
 #LLM client setup
 clientOpenAI = OpenAI()
+client = genai.Client()
 
 #list of error types ordered by index corresponding to that in pipline notebook
 error_types = []
 
-def generateGemini(prompt, model="gemini-2.0-flash"):
+def generateGemini(prompt, model="gemini-2.0-flash"):#gemini-2.5-flash-lite
     client = genai.Client(
         api_key=os.environ.get("GEMINI_API_KEY"),
     )
@@ -336,8 +337,8 @@ def generate_questions(questions_data=None):
     question_element["question"] = current_question
 
     try:#incase api error
-      #pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
-      generated_erroneous_solutions = None#[(pipeline_log[error_class]['final output']) for error_class in error_classes]
+      pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
+      generated_erroneous_solutions = [(pipeline_log[error_class]['final output']) for error_class in error_classes] or None
       question_element["error answers"] = generated_erroneous_solutions or ["generated solution goes here; uncomment pipeline call first" for i in range(len(error_classes))]
       question_element["error classes"] = error_classes
       generated_error_questions.append(question_element)
@@ -345,7 +346,7 @@ def generate_questions(questions_data=None):
       print("Error:\n")
       print(e)
       question_element = {
-        "question":"placeholder question",
+        "question":current_question,
         "error answers":["This is an erroneous answer"],
         "error classes": ["0"],
       }
@@ -353,12 +354,12 @@ def generate_questions(questions_data=None):
   return generated_error_questions
     #return pipeline2(question, answer, model_generate, model_examine)
 
-#check a given answer against the question and error type expected in the answer
-def check_answer(question_and_sample_answer: str, answer: str, expected_error_type: str):
-  instructions= """ verify and give concise feedback on the students answer
-                    identifying the error in the sample answer to the question
-                """
-  return "placeholder"
+# #check a given answer against the question and error type expected in the answer
+# def check_answer(question_and_sample_answer: str, answer: str, expected_error_type: str):
+#   instructions= """ verify and give concise feedback on the students answer
+#                     identifying the error in the sample answer to the question
+#                 """
+#   return "placeholder"
 #assignment { q: "", expected_error_class: ""}
 def _flatten_assignment(assignment):
   """Turn assignment (list of question dicts) into a flat list of tuples
@@ -379,7 +380,7 @@ def _flatten_assignment(assignment):
       flat.append({'question': question_text, 'erroneous': ea, 'expected': str(cls)})
   return flat
 
-def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini'):
+def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', use_openai=False):
   """Generate concise revision feedback comments for each answer.
 
   - answers: list of student's answer strings (flat order matching assignment)
@@ -409,21 +410,30 @@ def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini'):
       prompt += f"Previous attempt: {prev}\n"
       prompt += "Compare the previous attempt with the student's revised answer and give concise, specific feedback focused on what changed, what remains wrong (if anything), and one actionable suggestion to improve.\n"
     else:
-      prompt += "Give concise, specific feedback identifying the error in the original solution and one actionable suggestion for the student to revise their answer.\n"
+      prompt += "Give concise, specific feedback identifying the error in the original solution and one actionable suggestion for the student to revise their answer (if revision necessary).\n"
 
     system = (
-      "You are an expert math tutor. Provide short (1-3 sentence) actionable feedback aimed at helping a student revise their answer. "
-      "Be specific about the mistake, note any improvement compared to the previous attempt (when provided), and give a single clear suggestion for the next revision."
+      "You are an expert math tutor. Provide short (1-3 sentence) actionable feedback aimed at helping a student revise their answer (if a revision is still necessary). "
+      "Be specific about the mistake, note any improvement compared to the previous attempt (when provided), and give a single clear suggestion for the next revision (if a revision is still necessary)."
     )
 
     try:
-      completion = generatorOpenAI(prompt, model, system, temperature=0.5)
-      text = completion.choices[0].message.content.strip()
-      # keep only first paragraph for brevity
-      comment = text.split('\n\n')[0]
+      comment = None
+      if(use_openai):
+        completion = generatorOpenAI(prompt, model, system, temperature=0.5)
+        comment = completion.choices[0].message.content.strip()
+      else:
+        response = client.models.generate_content(
+          model="gemini-2.5-flash-lite", 
+          contents=f"System instructions: {system}; User prompt: {prompt}"
+        )
+        comment = response.text
+      #keep only first paragraph for brevity
+      comment = comment.split('\n\n')[0]
       if not comment:
         comment = "(No feedback generated)"
     except Exception as e:
+      print(f"Error in check_answers:\n {e}")
       # fallback heuristic
       if not student_answer:
         comment = "No answer submitted — try writing a short explanation of your steps."
