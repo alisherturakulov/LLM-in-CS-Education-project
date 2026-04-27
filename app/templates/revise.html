@@ -35,7 +35,7 @@
         {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
         
         {% set qnum = namespace(number=1) %}
-        {% for (erroneousAnswer), (answerfield), (logfield), (comment) in questions_tuple %}
+        {% for (erroneousAnswer), (answerfield), (logfield), (comment), (input_type) in questions_tuple %}
             <div class="questionGroup">
                 {% if corresponding_questions[loop.index0] != "" %}
                         <h3 class="questionNumber">
@@ -56,9 +56,20 @@
                 <p class="erroneousAnswer">
                     {{ erroneousAnswer }}
                 </p>
-                
-                {{ answerfield.label }}
-                {{ answerfield() }}
+                {% if input_type == 'select' %}
+                    {{ answerfield.label }}
+                    <select name="answers-{{ loop.index0 }}" id="answers-{{ loop.index0 }}">
+                        <option value="">Choose...</option>
+                        <option value="0">Mental Typo</option>
+                        <option value="1">Knowledge Gap</option>
+                        <option value="2">Misconception</option>
+                        <option value="3">Wrong Choice</option>
+                        <option value="4">Structural Blindness</option>
+                    </select>
+                {% else %}
+                    {{ answerfield.label }}
+                    {{ answerfield() }}
+                {% endif %}
                 {{ logfield() }} {# answer log field; comment here breaks nextElementSibling #}
             
             </div>

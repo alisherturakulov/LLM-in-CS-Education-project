@@ -1,11 +1,13 @@
 {
-        "assignment_id": {
+    "assignment_id": {
         "student_id": {
             "name": "",
             "questions": [
                 {
                     "question": "<question text>",
-                    "error answers": ["<first error answer which was originally generated in the subimt route to be identified>"],
+                    "error answers": [
+                        "<first error answer which was originally generated in the subimt route to be identified>"
+                    ],
                     "answers": [
                         "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
                     ],
@@ -47,9 +49,12 @@
                     "questions": [
                         {
                             "question": "<question text>",
-                            "error answers": [],
+                            "error answers": [
+                                "<first generated error answer which the student needs to identify the error in>"
+                            ],
                             "answers": [
-                                "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"                            ],
+                                "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"
+                            ],
                             "expected": [
                                 "<expected error type of first answer>"
                             ],
@@ -86,6 +91,220 @@
                                     "<time>": "<input>",
                                     "<time2>": "<input>"
                                 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "17": {
+        "7": {
+            "name": "Ali",
+            "questions": [],
+            "revisions": [
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "what is the meaning of polyprotic in acid-base chemistry",
+                            "answers": [
+                                "An acid that has multiple dissociations. The solution doesn't answer the question."
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that the original solution was not a valid answer to the question. However, you need to provide the *definition* of a polyprotic acid as requested by the question. For your next revision, please provide a clear and concise definition of what a polyprotic acid is in acid-base chemistry."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "how many sides does a square have",
+                            "answers": [
+                                "four"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that a square has four sides. This is a significant improvement from your previous attempt. Since the original prompt asked you to identify an error in an *erroneous* solution and your answer is correct, you have successfully completed the task."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "How does a rectangle compare to a square",
+                            "answers": [
+                                "a square is a rectangle but a rectangle isn't always square"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "The revised answer correctly identifies the relationship between squares and rectangles. However, it is a statement rather than a comparison, which is what the question asked for. To improve, explain *why* a square is a rectangle and *why* a rectangle is not always a square by discussing their properties."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "what is the meaning of polyprotic in acid-base chemistry",
+                            "answers": [
+                                "An acid that has multiple dissociations allowing it to donate more than one proton per molecule of acid. The solution doesn't answer the question."
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                "4/24/2026, 12:14:19 AM : An acid that has multiple dissociations. The solution doesn't answer the question.;4/24/2026, 12:15:34 AM : An acid that has multiple dissociations allowing it to donate more than one proton per molecule of acid. The solution doesn't answer the question.;"
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that the original solution was insufficient. However, it still lacks the definition of polyprotic acids. To improve, focus on providing a clear and concise definition based on the number of protons an acid can donate."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "how many sides does a square have",
+                            "answers": [
+                                "four"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                "4/24/2026, 12:14:19 AM : four;"
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that a square has four sides. Since this is the correct answer, no further revisions are needed. Well done!"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "How does a rectangle compare to a square",
+                            "answers": [
+                                "A square is a rectangle but a rectangle isn't always square because a rectangle doesn't need to have all sides equal, but only opposite sides. Both have four sides though."
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                "4/24/2026, 12:14:19 AM : a square is a rectangle but a rectangle isn't always square;4/24/2026, 12:14:27 AM : A square is a rectangle but a rectangle isn't always square;4/24/2026, 12:15:57 AM : A square is a rectangle but a rectangle isn't always square because a rectangle doesn't need to have ;"
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that a square is a specific type of rectangle, which is a great improvement. However, you can strengthen your explanation by explicitly stating the defining characteristic that all rectangles share. For your next revision, clearly state that all rectangles have four right angles."
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "18": {
+        "7": {
+            "name": "Ali",
+            "questions": [],
+            "revisions": [
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "What is the area of a 4 cm by 5 cm rectangle",
+                            "answers": [
+                                "The area is 20 cm^2 but the erroneous answer doesn't address the question nor does it answer it. roneou"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+                            ],
+                            "error answers": [
+                                "This is an erroneous answer"
+                            ],
+                            "input types": [
+                                "text"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "What is the area of a 4 cm by 5 cm rectangle",
+                            "answers": [
+                                "The area is 20 cm^2 but the erroneous answer doesn't address the question nor does it answer it. roneou"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.<br>Error in check_answers:<br> 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash-lite\\nPlease retry in 23.561349476s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash-lite'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '23s'}]}}"
+                            ],
+                            "error answers": [
+                                "This is an erroneous answer"
+                            ],
+                            "input types": [
+                                "text"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "What is the area of a 4 cm by 5 cm rectangle",
+                            "answers": [
+                                "The area is 20 cm^2 but the erroneous answer doesn't address the question nor does it answer it. roneou"
+                            ],
+                            "expected": [
+                                "0"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.<br>                   Error in check_answers:<br> 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash-lite\\nPlease retry in 59.954647504s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash-lite'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '59s'}]}}"
+                            ],
+                            "error answers": [
+                                "This is an erroneous answer"
+                            ],
+                            "input types": [
+                                "text"
                             ]
                         }
                     ]

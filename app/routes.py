@@ -55,7 +55,7 @@ def create_questions():
         questions_for_generating = assign_form.questions.data
         print("questions_for_generating: " + str(assign_form.questions.data))
         #shouls generate a list of dictionaries with
-        generated_error_questions = generate_questions(questions_for_generating)
+        generated_error_questions = generate_questions(questions_for_generating, use_openai=False)
         print("Generated_error_questions:\n"+ str(generated_error_questions))
         #to be accessed later in /submit-assignment
         #assignments.append(generated_error_questions)
@@ -98,15 +98,26 @@ def submit_answers(assignment_id):
         answer_logs = submit_form.answer_logs.data
         print(f"#########answer logs:\n {answer_logs}")
         answerIndex = 0
+        # override any answers coming from non-WTForms inputs (e.g. select fields rendered as raw HTML)
+        for i in range(len(answers)):
+            val = request.form.get(f'answers-{i}')
+            if val is not None:
+                answers[i] = val
         #add to intructor's respective assignment submissions column as table
         #retrieve assignment index from redirect url, 
         #expected = []# for each answer in order from assignment in global assignments list variable { q: "", expected_error_class: ""} 
         #check each corresponding answer with expected error
         print(f"Answers:\n {answers}")
         for question_element in current_assignment_dict:
-            result = {"name":"", "question":"", "answers":[],"expected":[], "answer history":[]}
+            result = {"name":"", "question":"", "error answers": [], "answers":[],"expected":[], "answer history":[], "input types": []}
             result["name"] = student_name
             result["question"] = question_element["question"]
+            # include original erroneous solutions for reference
+            result["error answers"] = question_element.get('error answers', [])
+            # record input types per error answer (repeat per-error-answer)
+            itype = question_element.get('input_type','text')
+            for _ in range(len(question_element.get('error classes', []))):
+                result['input types'].append(itype)
             for errorIndex in range(len(question_element["error classes"])):
                 result["answers"].append(answers[answerIndex] if answerIndex < len(answers) else "")
                 result["expected"].append(question_element["error classes"][errorIndex])
@@ -137,6 +148,7 @@ def submit_answers(assignment_id):
     #create a list of generated answers
     comments = []
     erroneous_solutions = []
+    input_types = []
     corresponding_questions = []#list of str questions corresp. to their first erroroneous answer if "" dont print question
     for assignment in current_assignment_dict:
         for i  in range(len(assignment["error answers"])):
@@ -148,6 +160,7 @@ def submit_answers(assignment_id):
             # placeholder comments (feedback generation not implemented)
             comments = []
             erroneous_solutions.append(error_answer)
+            input_types.append(assignment.get('input_type','text'))
             #answwers fieldlist should have length same as erroneous_solutions
             submit_form.answers.append_entry("")
             submit_form.answer_logs.append_entry("")
@@ -157,7 +170,7 @@ def submit_answers(assignment_id):
     #     print(f"{submit_form.answers.entries}\n{corresponding_questions}")
     #     return render_template_string(f"Error 500: lists of answerfields and corresponding questions don't match: {len(submit_form.answers.entries)} != {len(corresponding_questions)}\n{submit_form.answers.entries}\n{corresponding_questions}")
     
-    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs))
+    return render_template("index.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs, input_types))
 
     # return "Error with submission"
     # data = request.json
@@ -215,19 +228,32 @@ def revise(assignment_id):
         # build flattened lists of erroneous answers and last-known comments (from most recent revision)
         all_erroneous = []
         all_comments = []
+        all_input_types = []
         for q in current_assignment_dict:
             for i, ea in enumerate(q.get('error answers', [])):
                 all_erroneous.append(ea)
+                all_input_types.append(q.get('input_type','text'))
                 # try to pull latest comment for this question+index from most recent revision
                 comment = '(No comment)'
                 try:
                     # look at latest revision entries in existing_entry['revisions'] (if any)
                     revs = existing_entry.get('revisions', []) if isinstance(existing_entry.get('revisions', []), list) else []
+                    found = False
                     for rev in reversed(revs):
-                        if rev.get('question','') == q.get('question',''):
-                            cmts = rev.get('comments', [])
-                            comment = cmts[i] if i < len(cmts) else comment
-                            break
+                        if isinstance(rev, dict) and 'questions' in rev:
+                            for rq in rev.get('questions', []):
+                                if rq.get('question','') == q.get('question',''):
+                                    cmts = rq.get('comments', [])
+                                    comment = cmts[i] if i < len(cmts) else comment
+                                    found = True
+                                    break
+                            if found:
+                                break
+                        elif isinstance(rev, dict) and 'question' in rev:
+                            if rev.get('question','') == q.get('question',''):
+                                cmts = rev.get('comments', [])
+                                comment = cmts[i] if i < len(cmts) else comment
+                                break
                 except Exception:
                     comment = '(No comment)'
                 all_comments.append(comment)
@@ -241,11 +267,12 @@ def revise(assignment_id):
         for q in current_assignment_dict:
             for i in range(len(q.get('error answers', []))):
                 corresponding_questions.append(q.get('question','') if i==0 else "")
-        return render_template('revise.html', submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(all_erroneous, submit_form.answers, submit_form.answer_logs, all_comments))
+        return render_template('revise.html', submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(all_erroneous, submit_form.answers, submit_form.answer_logs, all_comments, all_input_types))
 
     # prepare empty fields for the form based on generated erroneous solutions
     erroneous_solutions = []
     corresponding_questions = []
+    input_types = []
     for assignment in current_assignment_dict:
         for i in range(len(assignment.get("error answers", []))):
             error_answer = assignment["error answers"][i]
@@ -254,6 +281,7 @@ def revise(assignment_id):
             else:
                 corresponding_questions.append("")
             erroneous_solutions.append(error_answer)
+            input_types.append(assignment.get('input_type','text'))
             submit_form.answers.append_entry("")
             submit_form.answer_logs.append_entry("")
 
@@ -292,11 +320,20 @@ def revise(assignment_id):
             # find prior answers for THIS question (last revision for this question, or initial submission)
             prior_for_question = None
             try:
-                # check revisions (most recent first)
-                for rev in reversed(existing_entry.get('revisions', []) if isinstance(existing_entry.get('revisions', []), list) else []):
-                    if rev.get('question','') == result['question']:
-                        prior_for_question = rev.get('answers', [])
-                        break
+                # check revisions (most recent first). Each revision may be a group with 'questions' or a legacy single-question dict
+                revs = existing_entry.get('revisions', []) if isinstance(existing_entry.get('revisions', []), list) else []
+                for rev in reversed(revs):
+                    if isinstance(rev, dict) and 'questions' in rev:
+                        for q in rev.get('questions', []):
+                            if q.get('question','') == result['question']:
+                                prior_for_question = q.get('answers', [])
+                                break
+                        if prior_for_question is not None:
+                            break
+                    elif isinstance(rev, dict) and 'question' in rev:
+                        if rev.get('question','') == result['question']:
+                            prior_for_question = rev.get('answers', [])
+                            break
                 # if no revisions, look for initial questions entry
                 if prior_for_question is None:
                     for q in reversed(existing_entry.get('questions', []) if isinstance(existing_entry.get('questions', []), list) else []):
@@ -308,7 +345,7 @@ def revise(assignment_id):
 
             # call check_answers to generate comments for each answer for this question
             try:
-                comments_for_q = check_answers(result.get('answers', []), [question_element], prior_answers=prior_for_question)
+                comments_for_q = check_answers(result.get('answers', []), [question_element], prior_answers=prior_for_question, use_openai=False)
             except Exception:
                 # fallback to placeholders
                 comments_for_q = ["(No comments generated)" for _ in result.get('answers', [])]
@@ -322,6 +359,9 @@ def revise(assignment_id):
                 'answer history': result.get('answer history',[]),
                 'comments': comments_for_q
             }
+            # include original erroneous answers and input types in revision record
+            revision_entry['error answers'] = question_element.get('error answers', [])
+            revision_entry['input types'] = [ question_element.get('input_type','text') for _ in range(len(question_element.get('error classes', []))) ]
             add_revision(assignment_id, student_id, revision_entry)
 
             # collect for rendering
@@ -335,9 +375,9 @@ def revise(assignment_id):
         # include student_id so GET can display the just-saved comments
         return redirect(request.path + f"?student_id={student_id}")
 
-    # provide a comments list (empty) so template can unpack 4 items
+    # provide a comments list (empty) so template can unpack items; input_types already prepared above
     comments = ["(No comments yet)"] * len(erroneous_solutions)
-    return render_template("revise.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs, comments))
+    return render_template("revise.html", submit=submit_form, corresponding_questions=corresponding_questions, questions_tuple=zip(erroneous_solutions, submit_form.answers, submit_form.answer_logs, comments, input_types))
 
 @app.route('/view', methods=['GET', 'POST'])
 def view():
@@ -359,57 +399,59 @@ def view():
         if not entry:
             return render_template("view.html", view=False, lookup=search_form)
 
-        # normalize questions into a flat list suitable for the template
-        flat_questions = []
-        qlist = []
-        if isinstance(entry.get('questions'), list):
-            qlist = entry.get('questions')
-        else:
-            qlist = [{
-                'question': entry.get('question',''),
-                'error answers': entry.get('error answers', []),
-                'answers': entry.get('answers', []),
-                'expected': entry.get('expected', []),
-            }]
+        # normalize questions into grouped lists so template can render each question once
+        grouped_submissions = []
+        qlist = entry.get('questions') if isinstance(entry.get('questions'), list) else [{
+            'question': entry.get('question',''),
+            'error answers': entry.get('error answers', []),
+            'answers': entry.get('answers', []),
+            'expected': entry.get('expected', []),
+        }]
 
         for q in qlist:
+            group = []
             answers = q.get('answers', [])
             expected = q.get('expected', [])
             error_answers = q.get('error answers', [])
             maxlen = max(len(answers), len(expected), len(error_answers))
             for i in range(maxlen):
-                flat_questions.append({
+                group.append({
                     'question': q.get('question','') if i == 0 else '',
                     'erroneousAnswer': error_answers[i] if i < len(error_answers) else '',
                     'error_class': expected[i] if i < len(expected) else '',
                     'answer': answers[i] if i < len(answers) else '',
                 })
+            grouped_submissions.append(group)
 
-        # normalize revisions similarly
-        flat_revisions = []
+        # normalize revisions into groups so each revision appears as its own block
+        grouped_revisions = []
         for rev in entry.get('revisions', []) if isinstance(entry.get('revisions', []), list) else []:
-            # revision may be a per-question dict or contain 'questions' list
-            if isinstance(rev, dict) and 'question' in rev:
-                for i, ans in enumerate(rev.get('answers', [])):
-                    flat_revisions.append({
-                        'question': rev.get('question',''),
-                        'erroneousAnswer': rev.get('error answers', [])[i] if i < len(rev.get('error answers', [])) else '',
-                        'error_class': rev.get('expected', [])[i] if i < len(rev.get('expected', [])) else '',
-                        'answer': ans,
-                        'comment': rev.get('comments', [])[i] if i < len(rev.get('comments', [])) else ''
-                    })
-            elif isinstance(rev, dict) and 'questions' in rev:
+            if isinstance(rev, dict) and 'questions' in rev:
+                group = []
                 for q in rev.get('questions', []):
                     for i, ans in enumerate(q.get('answers', [])):
-                        flat_revisions.append({
+                        group.append({
                             'question': q.get('question',''),
                             'erroneousAnswer': q.get('error answers', [])[i] if i < len(q.get('error answers', [])) else '',
                             'error_class': q.get('expected', [])[i] if i < len(q.get('expected', [])) else '',
                             'answer': ans,
                             'comment': q.get('comments', [])[i] if i < len(q.get('comments', [])) else ''
                         })
+                grouped_revisions.append(group)
+            elif isinstance(rev, dict) and 'question' in rev:
+                # legacy single-question revision entry
+                group = []
+                for i, ans in enumerate(rev.get('answers', [])):
+                    group.append({
+                        'question': rev.get('question',''),
+                        'erroneousAnswer': rev.get('error answers', [])[i] if i < len(rev.get('error answers', [])) else '',
+                        'error_class': rev.get('expected', [])[i] if i < len(rev.get('expected', [])) else '',
+                        'answer': ans,
+                        'comment': rev.get('comments', [])[i] if i < len(rev.get('comments', [])) else ''
+                    })
+                grouped_revisions.append(group)
 
-        return render_template('view.html', view=True, assignment_id=assignment_id, questions=flat_questions, revisions=flat_revisions)
+        return render_template('view.html', view=True, assignment_id=assignment_id, questions=grouped_submissions, revisions=grouped_revisions)
     return render_template('view.html', view=False, lookup=search_form, assignment_id=None, questions=None, revisions=None)
 
 def isValidAssignment(assignments: list, assignment_id: int):
@@ -470,10 +512,31 @@ def add_revision(assignment_id: int, student_id: str, revision_entry: dict, data
         student_map[sid] = {"name": revision_entry.get('name',''), "questions": [], "revisions": []}
 
     student_entry = student_map[sid]
-    student_entry.setdefault('revisions', []).append(revision_entry)
+    # ensure revision entries follow the canonical format used in data/submissions.json
+    to_append = revision_entry if isinstance(revision_entry, dict) and 'questions' in revision_entry else {'questions': [revision_entry]}
+    student_entry.setdefault('revisions', []).append(to_append)
 
+    # write student file
     with open(student_file, 'w', encoding='utf-8') as f:
         json.dump(dataObject, f, indent=4)
+
+    # also update base submissions.json so the global store matches the per-student file
+    base_file = filepath
+    try:
+        with open(base_file, 'r', encoding='utf-8') as f:
+            base_obj = json.load(f)
+    except Exception:
+        base_obj = {}
+
+    if str(assignment_id) not in base_obj:
+        base_obj[str(assignment_id)] = {}
+    base_student_map = base_obj[str(assignment_id)]
+    if sid not in base_student_map or not isinstance(base_student_map[sid], dict):
+        base_student_map[sid] = {"name": revision_entry.get('name',''), "questions": [], "revisions": []}
+    base_student_map[sid].setdefault('revisions', []).append(to_append)
+    with open(base_file, 'w', encoding='utf-8') as f:
+        json.dump(base_obj, f, indent=4)
+
     return True
       
 def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, student_id=-1):
@@ -540,7 +603,7 @@ def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, stude
                 if 'questions' not in existing and any(k in existing for k in ('question','answers')):
                     qobj = {
                         'question': existing.get('question',''),
-                        'error answers': exisiting.get('error answers', []),
+                        'error answers': existing.get('error answers', []),
                         'answers': existing.get('answers',[]),
                         'expected': existing.get('expected',[]),
                         'answer history': existing.get('answer history',[])

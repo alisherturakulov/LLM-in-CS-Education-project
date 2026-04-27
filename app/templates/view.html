@@ -6,44 +6,46 @@
 
         <h3>Submission</h3>
         <div id="submissionViewBox" >
-            {% for question in questions %}
-            <div class="questionGroup">
-                <p class="question">
-                        {{ question.question}}
-                </p>
-                <p class="erroneousAnswer">
-                        {{question.erroneousAnswer}}
-                </p>
-                <p class="expected">
-                        {{question.error_class}}
-                </p>
-                <p class="answer">
-                        {{question.answer}}
-                </p>
-            </div>
+            {% for qgroup in questions %}
+                <div class="submissionGroup">
+                    {% for question in qgroup %}
+                        <div class="questionGroup">
+                            {% if question.question %}
+                                <p class="question">{{ question.question }}</p>
+                            {% endif %}
+                            <p class="erroneousAnswer">{{ question.erroneousAnswer }}</p>
+                            <p class="expected">{{ question.error_class }}</p>
+                            <p class="answer">{{ question.answer }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endfor %}
         </div>
 
         <h3> Revisions </h3>
         <div id="revisionsViewBox">
-            {% for revision in revisions %}
-                <div class="questionGroup">
+            {% for rev_group in revisions %}
+                <div class="revisionGroup">
                     <h5>Revision {{ loop.index }}</h5>
-                    <p class="question">
-                        {{ revision.question}}
-                    </p>
-                    <p class="erroneousAnswer">
-                        {{revision.erroneousAnswer}}
-                    </p>
-                    <p class="expected">
-                        {{revision.error_class}}
-                    </p>
-                    <p class="answer">
-                        {{revision.answer}}
-                    </p>
-                    <p class="comment">
-                        {{revision.comment}}
-                    </p>
+                    {% for revision in rev_group %}
+                        <div class="questionGroup">
+                            <p class="question">
+                                {{ revision.question}}
+                            </p>
+                            <p class="erroneousAnswer">
+                                {{revision.erroneousAnswer}}
+                            </p>
+                            <p class="expected">
+                                {{revision.error_class}}
+                            </p>
+                            <p class="answer">
+                                {{revision.answer}}
+                            </p>
+                            <p class="comment">
+                                {{revision.comment}}
+                            </p>
+                        </div>
+                    {% endfor %}
                 </div>
             {% endfor %}
         </div>

@@ -45,6 +45,9 @@
                     "questions": [
                         {
                             "question": "<question text>",
+                            "error answers": [
+                                "<first generated error answer which the student needs to identify the error in>"
+                            ],
                             "answers": [
                                 "<first answer string; text type inputs and highlight type inputs have their inputs passed as strings>"                            ],
                             "expected": [
@@ -62,6 +65,9 @@
                         },
                         {
                             "question": "<question text>",
+                            "error answers": [
+                                "<first generated error answer which the student needs to identify the error in>"
+                            ],
                             "answers": [
                                 "<first answer string; select type inputs have the selected error type entered here>",
                                 "<second answer string; select type inputs have the selected error type entered here>"

@@ -84,16 +84,44 @@ def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effo
             ],
       )
   else:
-    completion = "<Gemini API completion>"
+    # Use Gemini via google.genai and return a wrapper object compatible with
+    # the OpenAI-style response used elsewhere (choices[0].message.content and usage).
     try:
       response = client.models.generate_content(
-        model="gemini-2.5-flash-lite", 
+        model="gemini-2.5-flash-lite",
         contents=f"System instructions: {system_prompt}; User prompt: {content}"
       )
-      completion = response
+      text = getattr(response, 'text', str(response))
     except Exception as e:
-      completion = e
-  return completion
+      text = f"<Gemini error: {e}>"
+
+    # Build a minimal compatibility object mimicking OpenAI response shape
+    class _Msg:
+      def __init__(self, content):
+        class _Inner:
+          def __init__(self, content):
+            self.content = content
+        self.message = type('x', (), { 'content': content })
+
+    class _Choice:
+      def __init__(self, content):
+        self.message = type('x', (), {'content': content})
+
+    class _Usage:
+      def __init__(self):
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        class _Details:
+          def __init__(self):
+            self.reasoning_tokens = 0
+        self.completion_tokens_details = _Details()
+
+    class _Completion:
+      def __init__(self, text):
+        self.choices = [ _Choice(text) ]
+        self.usage = _Usage()
+
+    return _Completion(text)
 
 ###################text instructions
 system_prompt_generate1 = """You are a helpful, precise, and reasoning-focused AI assistant. You are collaborating with another agent who is designed to simulate student-like mistakes. This agent can generate erroneous answers to a given math question, where each answer demonstrates a specific type of common student error. There are five defined error types: Mental Typo, Knowledge Gap, Misconception, Wrong Choice, and Structural Blindness.
@@ -226,12 +254,17 @@ Justification: [Return the justification of your decision.]"""
 prompt_examine_extract = """Return the error class number ONLY based on the text.
 Text: {0}"""
 
+# A short excerpt of the error definitions used for examination prompts
+# Keep this separate so the examination prompt can reference just the numbered
+# error-type definitions (starting at '1.')
+error_definitions_examine1 = system_prompt_generate1[system_prompt_generate1.index("1."):]
+
 # Pipeline 2
 # GA + EA
 # 1) receive a question, generate its step by step sol (could have minor mistakes in it) (step by step answer is generated given correct answer)
 # 2) generate a error type of the question
 # 3) examine the generated type: if match, pass; otherwise, redo step3 till match
-def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
+def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, use_openai:bool=True):
   log = {str(error_class):None for error_class in range(1,6)}
   for error_class in range(1, 6): # error_class: int
     log[str(error_class)] = {"generation history": [], # list of str
@@ -261,9 +294,9 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
       # generate a type of a question
       time1 = time.time()
       if examination_feedback == "":
-        generation_completion = generatorOpenAI(prompt_generate.format(str(error_class), question, answer), model_generate, system_prompt_generate1)
+        generation_completion = generatorOpenAI(prompt_generate.format(str(error_class), question, answer), model_generate, system_prompt_generate1, use_openai=use_openai)
       else:
-        generation_completion = generatorOpenAI(prompt_generate_feedback.format(str(error_class), question, answer, examination_result, examination_feedback), model_generate, system_prompt_generate1)
+        generation_completion = generatorOpenAI(prompt_generate_feedback.format(str(error_class), question, answer, examination_result, examination_feedback), model_generate, system_prompt_generate1, use_openai=use_openai)
       time2 = time.time()
       generated_error_response = generation_completion.choices[0].message.content
 
@@ -280,10 +313,10 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
 
       # examine the error class
       time3 = time.time()
-      examination_completion = generatorOpenAI(prompt_examine.format(error_definitions_examine1, question, answer, str(error_class), generated_error_response), model_examine, system_prompt_examine)
+      examination_completion = generatorOpenAI(prompt_examine.format(error_definitions_examine1, question, answer, str(error_class), generated_error_response), model_examine, system_prompt_examine, use_openai=use_openai)
       time4 = time.time()
       examination_justification = examination_completion.choices[0].message.content
-      examination_result = generatorOpenAI(prompt_examine_extract.format(examination_justification), model_examine, "You're a useful agent on extracting information.").choices[0].message.content
+      examination_result = generatorOpenAI(prompt_examine_extract.format(examination_justification), model_examine, "You're a useful agent on extracting information.", use_openai=use_openai).choices[0].message.content
       if examination_result != str(error_class):
         examination_feedback = examination_justification
 
@@ -314,7 +347,7 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str):
 
 #use pipeline from notebook
 #questions data a list of dicts
-def generate_questions(questions_data=None):
+def generate_questions(questions_data=None, use_openai:bool=False):
   answer=""#generate correct solution
   if(not questions_data):
     question_element = {
@@ -342,14 +375,23 @@ def generate_questions(questions_data=None):
       "question":"",
       "error answers": [],
       "error classes": [],
+      "input_type": "text",
     }
     current_question = question_field_dict["question"]
     answer="generate correct answer"#maybe generate correct answer
     error_classes = question_field_dict["error_types"]
     question_element["question"] = current_question
-
+    # include the input type (0=text,1=highlight,2=select) for rendering and storage
+    atype = question_field_dict.get('answer_type', '')
+    # normalize to human readable key
+    if str(atype) == '1':
+      question_element['input_type'] = 'highlight'
+    elif str(atype) == '2':
+      question_element['input_type'] = 'select'
+    else:
+      question_element['input_type'] = 'text'
     try:#incase api error
-      pipeline_log = pipeline2(current_question, answer, model_generate, model_examine)
+      pipeline_log =None# pipeline2(current_question, answer, model_generate, model_examine, use_openai=use_openai)
       generated_erroneous_solutions = [(pipeline_log[error_class]['final output']) for error_class in error_classes] or None
       question_element["error answers"] = generated_erroneous_solutions or ["generated solution goes here; uncomment pipeline call first" for i in range(len(error_classes))]
       question_element["error classes"] = error_classes
@@ -451,7 +493,7 @@ def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', u
       if not student_answer:
         comment = "No answer submitted — try writing a short explanation of your steps."
       else:
-        comment = "Check the algebra and reasoning: be explicit about each step and verify where the original solution erred."
+        comment = f"Check the algebra and reasoning: be explicit about each step and verify where the original solution erred.<br>                   Error in check_answers:<br> {e}"
     comments.append(comment)
 
   return comments

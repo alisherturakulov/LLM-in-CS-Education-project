@@ -18,11 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
       p.addEventListener('mouseup', () => {
          const selection = window.getSelection().toString().trim();
          if (!selection) return;
-         // find next input (the answer input)
+         // find the first form control (INPUT, SELECT, or TEXTAREA) among following siblings
          let sibling = p.nextElementSibling;
-         while (sibling && sibling.tagName !== 'INPUT') sibling = sibling.nextElementSibling;
-         if (!sibling) return;
-         const input = sibling;
+         let firstControl = null;
+         while (sibling) {
+            const tag = sibling.tagName;
+            if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') { firstControl = sibling; break; }
+            sibling = sibling.nextElementSibling;
+         }
+         if (!firstControl) return;
+         // if the first control is a SELECT, do not apply highlight behavior
+         if (firstControl.tagName === 'SELECT') return;
+         // otherwise expect an INPUT-like element and append the selection
+         const input = firstControl;
          const sep = input.value === '' ? '' : ' ';
          input.value = input.value + sep + selection;
          input.dispatchEvent(new Event('change'));
