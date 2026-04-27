@@ -7,9 +7,9 @@ import os, json
 #import db from module where initialized, use data folder json for now
 
 #holds the question_generated obj to be used to generate the assignment fillout
-assignments = []
-submissions = []
-results = []
+# assignments = []
+# submissions = []
+# results = []
 #submission= {"student_name":"", "student_id":"", "answers":[]}
 
 idx = 0
@@ -18,28 +18,39 @@ idx = 0
 #     "error answers":[],
 #     "error classes":[],
 # }}
-
+load_dotenv()
+os.getenv("ADMIN_PIN")
+remember_me = False#from login route, so login wont be required again.
 # @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
-def home():
+def home(redirect=None, number=None):
     #check db for authentication
     login_form = Login()
-    signup_form = Signup()
-    
+    # signup_form = Signup()
+    if (not redirect):
+        redirect = "/assign"
     if (request.method=="POST"):
         if(login_form.validate_on_submit()):
-            username = login_form.username.data
-            password= login_form.password.data
-            remember_me = login_form.remember_me.data
+            # username = login_form.username.data
+            password = login_form.password.data
+            print(password)
+            print(os.environ.get("ADMIN_PIN"))
+            if(password == os.environ.get("ADMIN_PIN")):
+
+                remember_me = login_form.remember_me.data
+                if (number):
+                    redirect = redirect + "/" + number
+                return redirect(redirect)
+            return render_template_string("error.html", error_message="incorrect login")
             #in db match password hashed with the stored password hash under instructor_id with this username
-        if(signup_form.validate_on_submit()):
-            username = signup_form.username.data
-            password = signup_form.password.data
-            #make sure username's not a duplicate
-            #store in db under new userid
-        return redirect("/assign")
+        # if(signup_form.validate_on_submit()):
+        #     username = signup_form.username.data
+        #     password = signup_form.password.data
+        #     #make sure username's not a duplicate
+        #     #store in db under new userid
+        # return redirect("/assign")
     
-    return render_template('login.html', login_form=login_form, signup_form=signup_form)
+    return render_template('login.html', login_form=login_form)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/assign', methods=['GET','POST'])
