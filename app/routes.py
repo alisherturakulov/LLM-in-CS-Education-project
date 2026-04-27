@@ -1,60 +1,41 @@
 #routing for flask project
 from app import app
-from flask import render_template, request, redirect, render_template_string, url_for
+from flask import render_template, request, redirect, render_template_string, url_for, session, flash
 from app.pipeline import generate_questions, check_answers
 from app.forms import Login, Signup, CreateAssignment, Submit, Search
 import os, json
-#import db from module where initialized, use data folder json for now
 
-#holds the question_generated obj to be used to generate the assignment fillout
-# assignments = []
-# submissions = []
-# results = []
-#submission= {"student_name":"", "student_id":"", "answers":[]}
+# Using Flask session to track login state instead of global variable
 
-idx = 0
-# assignment = {idx : {
-#     "question":"",
-#     "error answers":[],
-#     "error classes":[],
-# }}
-load_dotenv()
-os.getenv("ADMIN_PIN")
-remember_me = False#from login route, so login wont be required again.
-# @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
-def home(redirect=None, number=None):
+@app.route('/login/<path>', methods=['GET', 'POST'])
+@app.route('/login/<path>/<int:id>', methods=['GET', 'POST'])
+def home(path=None, id=None):
     #check db for authentication
     login_form = Login()
     # signup_form = Signup()
-    if (not redirect):
-        redirect = "/assign"
-    if (request.method=="POST"):
-        if(login_form.validate_on_submit()):
-            # username = login_form.username.data
-            password = login_form.password.data
-            print(password)
-            print(os.environ.get("ADMIN_PIN"))
-            if(password == os.environ.get("ADMIN_PIN")):
-
-                remember_me = login_form.remember_me.data
-                if (number):
-                    redirect = redirect + "/" + number
-                return redirect(redirect)
-            return render_template_string("error.html", error_message="incorrect login")
-            #in db match password hashed with the stored password hash under instructor_id with this username
-        # if(signup_form.validate_on_submit()):
-        #     username = signup_form.username.data
-        #     password = signup_form.password.data
-        #     #make sure username's not a duplicate
-        #     #store in db under new userid
-        # return redirect("/assign")
-    
+    if(request.method=="POST" and login_form.validate_on_submit()):
+        # username = login_form.username.data
+        password = login_form.password.data
+        if password == os.environ.get("ADMIN_PIN"):
+            session['logged_in'] = True
+            # build return path
+            if not path:
+                target = "/"
+            elif id is None:
+                target = f"/{path}"
+            else:
+                target = f"/{path}/{str(id)}"
+            return redirect(target)
+        else:
+            return render_template("error.html", error_message="incorrect login")
     return render_template('login.html', login_form=login_form)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/assign', methods=['GET','POST'])
 def create_questions():
+    if not session.get('logged_in'):
+        return redirect("/login/assign")
     assign_form = CreateAssignment()
     #data = request.data.json#formdata json object receive
     #number_of_qs = data["questionCount"] or 1
@@ -190,6 +171,8 @@ def submit_answers(assignment_id):
 
 @app.route("/share/<int:assignment_id>")
 def share(assignment_id):#index from assignments list
+    if not session.get('logged_in'):
+        return redirect(f"/login/share/{assignment_id}")
     assignments = loadJSON("assignments.json")
     if isValidAssignment(assignments, assignment_id):
         current_assignment_dict = assignments[assignment_id]
@@ -392,6 +375,8 @@ def revise(assignment_id):
 
 @app.route('/view', methods=['GET', 'POST'])
 def view():
+    if not session.get('logged_in'):
+        return redirect("/login/view")
     search_form = Search()
     if search_form.validate_on_submit():
         student_id = search_form.student_id.data
