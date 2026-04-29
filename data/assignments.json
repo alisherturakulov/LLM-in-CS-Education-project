@@ -372,5 +372,48 @@
                 "0"
             ]
         }
+    ],
+    [
+        {
+            "question": "What is the area of a 4 cm by 5 cm rectangle",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        }
+    ],
+    [
+        {
+            "question": "q1 test",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ],
+            "input_type": "text",
+            "input_types": [
+                "text"
+            ]
+        },
+        {
+            "question": "q2 test",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        }
     ]
 ]

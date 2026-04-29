@@ -11,7 +11,12 @@ import os, json
 @app.route('/login/<path>', methods=['GET', 'POST'])
 @app.route('/login/<path>/<int:id>', methods=['GET', 'POST'])
 def home(path=None, id=None):
-    #check db for authentication
+    """Render login page and handle admin sign-in.
+
+    POST with correct `ADMIN_PIN` sets `session['logged_in']` and redirects
+    to the provided path (if any). GET renders the login form.
+    """
+    # check db for authentication
     login_form = Login()
     # signup_form = Signup()
     if(request.method=="POST" and login_form.validate_on_submit()):
@@ -34,6 +39,12 @@ def home(path=None, id=None):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/assign', methods=['GET','POST'])
 def create_questions():
+    """Render assignment creation form and persist generated assignment.
+
+    Uses `CreateAssignment` to collect question templates, calls
+    `generate_questions()` to build the assignment entries, attaches `input_types`,
+    and appends the result to `data/assignments.json`.
+    """
     if not session.get('logged_in'):
         return redirect("/login/assign")
     assign_form = CreateAssignment()
@@ -53,6 +64,23 @@ def create_questions():
         #assignments.append(generated_error_questions)
         
         #takes care of file locking concurrency, appends to exisiting data in file
+        # attach input type metadata to each generated question based on the form's answer_type
+        # map WTForms choice values to string types
+        type_map = {'0': 'text', '1': 'highlight', '2': 'select'}
+        try:
+            for idx, q in enumerate(generated_error_questions):
+                # form entry may be shorter if defaults used
+                form_entry = questions_for_generating[idx] if idx < len(questions_for_generating) else {}
+                atype = str(form_entry.get('answer_type', '0'))
+                typ = type_map.get(atype, 'text')
+                # legacy single value for backwards compatibility
+                q['input_type'] = typ
+                # store per-error-answer input types as an array to preserve mapping
+                err_count = len(q.get('error answers', []))
+                q['input_types'] = [typ for _ in range(err_count)]
+        except Exception:
+            pass
+
         newLength = addToJSON(generated_error_questions, "assignments.json")
         # questions = generate_questions(number_of_qs)
         if (newLength <= 0):
@@ -68,10 +96,14 @@ def create_questions():
 
 @app.route('/submit-assignment/<int:assignment_id>', methods=['GET','POST'])
 def submit_answers(assignment_id):
-    feedback = {
-        #in the same order as the answers were received
-        #"1":"",#commment out once db is setup
-        } 
+    """Handle GET/POST for submitting student answers.
+
+    On GET: render the flat list of erroneous solutions and corresponding
+    empty answer/history fields. 
+    On POST: collect answers assemble per-question
+    submission entries and save with `addToJSON`.
+    """
+    feedback = {}
     submit_form = Submit()
     #access latest created assignment from global object
     assignment_results = []
@@ -103,24 +135,21 @@ def submit_answers(assignment_id):
         for question_element in current_assignment_dict:
             result = {"name":"", "question":"", "error answers": [], "answers":[],"expected":[], "answer history":[], "input types": []}
             result["name"] = student_name
-            result["question"] = question_element["question"]
+            result["question"] = question_element.get("question","")
             # include original erroneous solutions for reference
             result["error answers"] = question_element.get('error answers', [])
-            # record input types per error answer (repeat per-error-answer)
-            itype = question_element.get('input_type','text')
-            for _ in range(len(question_element.get('error classes', []))):
-                result['input types'].append(itype)
-            for errorIndex in range(len(question_element["error classes"])):
+            # determine per-error input types: prefer explicit list, fall back to single value repeated
+            per_error_types = question_element.get('input_types') or [question_element.get('input_type','text') for _ in range(len(question_element.get('error answers', [])))]
+            for t in per_error_types:
+                result['input types'].append(t)
+            for errorIndex in range(len(question_element.get("error classes", []))):
+                # answers captured from WTForms inputs or raw form overrides above
                 result["answers"].append(answers[answerIndex] if answerIndex < len(answers) else "")
-                result["expected"].append(question_element["error classes"][errorIndex])
+                result["expected"].append(question_element.get("error classes", [])[errorIndex] if errorIndex < len(question_element.get("error classes", [])) else "")
                 # convert the log string into list-of-dicts per autosave snapshot
                 raw_log = answer_logs[answerIndex] if answerIndex < len(answer_logs) else ""
                 parsed = parse_log_string(raw_log)
                 result["answer history"].append(parsed)
-                # index_str = str(index)
-                # answers.append(submit_form.answer_tag.data)
-                # expected[index_str] = assignments[assignment_id][error_classes]
-                # feedback[index_str] = check_answer(submit_form.answer_tag.data)
                 answerIndex += 1
                 #answers_json = jsonify(answers)
                 #feedback_json = jsonify(feedback)
@@ -143,6 +172,7 @@ def submit_answers(assignment_id):
     input_types = []
     corresponding_questions = []#list of str questions corresp. to their first erroroneous answer if "" dont print question
     for assignment in current_assignment_dict:
+        per_error_input_types = assignment.get('input_types') or [assignment.get('input_type','text') for _ in range(len(assignment.get('error answers', [])))]
         for i  in range(len(assignment["error answers"])):
             error_answer = assignment["error answers"][i]
             if i == 0:
@@ -152,7 +182,7 @@ def submit_answers(assignment_id):
             # placeholder comments (feedback generation not implemented)
             comments = []
             erroneous_solutions.append(error_answer)
-            input_types.append(assignment.get('input_type','text'))
+            input_types.append(per_error_input_types[i] if i < len(per_error_input_types) else assignment.get('input_type','text'))
             #answwers fieldlist should have length same as erroneous_solutions
             submit_form.answers.append_entry("")
             submit_form.answer_logs.append_entry("")
@@ -171,6 +201,11 @@ def submit_answers(assignment_id):
 
 @app.route("/share/<int:assignment_id>")
 def share(assignment_id):#index from assignments list
+    """Render share page for an assignment (instructor view).
+
+    Requires instructor login. Presents a shareable URL for the
+    assignment identified by `assignment_id`.
+    """
     if not session.get('logged_in'):
         return redirect(f"/login/share/{assignment_id}")
     assignments = loadJSON("assignments.json")
@@ -201,6 +236,11 @@ def share(assignment_id):#index from assignments list
 
 @app.route("/revise/<int:assignment_id>", methods=['GET', 'POST'])
 def revise(assignment_id):
+    """page to submit revised assignment
+    GET with `student_id` shows the student's last submission and
+    generated comments (generates comments from initial submission if
+    no prior revisions exist). POST records a new revision list entry.
+    """
     submit_form = Submit()
     # load assignments and validate
     assignments = loadJSON("assignments.json")
@@ -226,7 +266,8 @@ def revise(assignment_id):
         for q in current_assignment_dict:
             for i, ea in enumerate(q.get('error answers', [])):
                 all_erroneous.append(ea)
-                all_input_types.append(q.get('input_type','text'))
+                per_error = q.get('input_types') or [q.get('input_type','text') for _ in range(len(q.get('error answers', [])))]
+                all_input_types.append(per_error[i] if i < len(per_error) else q.get('input_type','text'))
                 # try to pull latest comment for this question+index from most recent revision
                 comment = '(No comment)'
                 try:
@@ -250,6 +291,35 @@ def revise(assignment_id):
                                 break
                 except Exception:
                     comment = '(No comment)'
+                # If no revision comment was found, try to generate comments from the student's initial submission
+                if comment == '(No comment)':
+                    try:
+                        # look for an initial submission entry matching this question
+                        submitted_questions = existing_entry.get('questions', []) if isinstance(existing_entry.get('questions', []), list) else []
+                        found_initial = False
+                        for qsub in reversed(submitted_questions):
+                            if qsub.get('question','') == q.get('question',''):
+                                # qsub.answers is a list of submitted answers for this question
+                                prior_answers = qsub.get('answers', [])
+                                # generate comments for these answers using check_answers
+                                try:
+                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=False)
+                                except Exception:
+                                    comments_for_q = ["(No comment generated)"] * len(prior_answers)
+                                comment = comments_for_q[i] if i < len(comments_for_q) else comment
+                                found_initial = True
+                                break
+                        if not found_initial:
+                            # legacy single-question submissions: check top-level keys
+                            if existing_entry.get('question','') == q.get('question',''):
+                                prior_answers = existing_entry.get('answers', [])
+                                try:
+                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=False)
+                                except Exception:
+                                    comments_for_q = ["(No comment generated)"] * len(prior_answers)
+                                comment = comments_for_q[i] if i < len(comments_for_q) else comment
+                    except Exception:
+                        pass
                 all_comments.append(comment)
 
         # prepare form entries and render with comments
@@ -275,7 +345,8 @@ def revise(assignment_id):
             else:
                 corresponding_questions.append("")
             erroneous_solutions.append(error_answer)
-            input_types.append(assignment.get('input_type','text'))
+            per_error_input_types = assignment.get('input_types') or [assignment.get('input_type','text') for _ in range(len(assignment.get('error answers', [])))]
+            input_types.append(per_error_input_types[i] if i < len(per_error_input_types) else assignment.get('input_type','text'))
             submit_form.answers.append_entry("")
             submit_form.answer_logs.append_entry("")
 
@@ -302,6 +373,11 @@ def revise(assignment_id):
         # collect flattened lists for rendering after save
         all_erroneous = []
         all_comments = []
+
+        # collect per-question revision dicts, then save them as a single
+        # grouped revision object so one revision contains all related
+        # question dicts under the 'questions' key
+        per_question_revisions = []
 
         for question_element in current_assignment_dict:
             result = {"name": student_name, "question": question_element.get("question", ""), "answers": [], "expected": [], "answer history": []}
@@ -344,26 +420,30 @@ def revise(assignment_id):
                 # fallback to placeholders
                 comments_for_q = ["(No comments generated)" for _ in result.get('answers', [])]
 
-            # attach comments to revision entry
+            # build per-question revision dict
             revision_entry = {
                 'name': result.get('name',''),
                 'question': result.get('question',''),
                 'answers': result.get('answers',[]),
                 'expected': result.get('expected',[]),
                 'answer history': result.get('answer history',[]),
-                'comments': comments_for_q
+                'comments': comments_for_q,
+                'error answers': question_element.get('error answers', []),
+                'input types': question_element.get('input_types') or [ question_element.get('input_type','text') for _ in range(len(question_element.get('error classes', []))) ]
             }
-            # include original erroneous answers and input types in revision record
-            revision_entry['error answers'] = question_element.get('error answers', [])
-            revision_entry['input types'] = [ question_element.get('input_type','text') for _ in range(len(question_element.get('error classes', []))) ]
-            add_revision(assignment_id, student_id, revision_entry)
+            per_question_revisions.append(revision_entry)
 
-            # collect for rendering
+            # collect for rendering (flattened lists)
             for i, ea in enumerate(question_element.get('error answers', [])):
                 all_erroneous.append(ea)
                 # each erroneous answer corresponds to an entry in comments_for_q (if lengths align)
                 c = comments_for_q[i] if i < len(comments_for_q) else "(No comment)"
                 all_comments.append(c)
+
+        # persist a single grouped revision object for this POST
+        if per_question_revisions:
+            grouped = {'questions': per_question_revisions}
+            add_revision(assignment_id, student_id, grouped)
 
         # redirect to GET (Post-Redirect-Get) so browser won't re-submit repeatedly
         # include student_id so GET can display the just-saved comments
@@ -375,6 +455,10 @@ def revise(assignment_id):
 
 @app.route('/view', methods=['GET', 'POST'])
 def view():
+    """To allow looking up a student's submissions.
+    Checks if logged in, redirects to login if not
+    Allows lookup using student_id and assignment_jd
+    """
     if not session.get('logged_in'):
         return redirect("/login/view")
     search_form = Search()
@@ -451,6 +535,9 @@ def view():
     return render_template('view.html', view=False, lookup=search_form, assignment_id=None, questions=None, revisions=None)
 
 def isValidAssignment(assignments: list, assignment_id: int):
+    """Return True if `assignment_id` is a valid index in `assignments`.
+    `assignments` is expected to be a list; returns False for other types.
+    """
     return isinstance(assignments, list) and assignment_id < len(assignments) and assignment_id >= 0
 
 
@@ -491,50 +578,47 @@ def add_revision(assignment_id: int, student_id: str, revision_entry: dict, data
         else:
             with open(student_file, 'w', encoding='utf-8') as dst:
                 json.dump({}, dst)
-
+    # Load existing student file safely
     try:
         with open(student_file, 'r', encoding='utf-8') as f:
             dataObject = json.load(f)
     except Exception:
         dataObject = {}
 
+    # Ensure assignment slot exists
     if str(assignment_id) not in dataObject:
         dataObject[str(assignment_id)] = {}
 
     student_map = dataObject[str(assignment_id)]
     sid = str(student_id)
     if sid not in student_map or not isinstance(student_map[sid], dict):
-        # initialize
-        student_map[sid] = {"name": revision_entry.get('name',''), "questions": [], "revisions": []}
+        student_map[sid] = {"name": revision_entry.get('name', ''), "questions": [], "revisions": []}
 
     student_entry = student_map[sid]
-    # ensure revision entries follow the canonical format used in data/submissions.json
+    # Normalize revision entry -> always append an object with a 'questions' list
     to_append = revision_entry if isinstance(revision_entry, dict) and 'questions' in revision_entry else {'questions': [revision_entry]}
     student_entry.setdefault('revisions', []).append(to_append)
 
-    # write student file
-    with open(student_file, 'w', encoding='utf-8') as f:
-        json.dump(dataObject, f, indent=4)
-
-    # also update base submissions.json so the global store matches the per-student file
-    base_file = filepath
+    # persist atomically to avoid partial writes/corruption
+    tmp_file = student_file + '.tmp'
     try:
-        with open(base_file, 'r', encoding='utf-8') as f:
-            base_obj = json.load(f)
+        with open(tmp_file, 'w', encoding='utf-8') as f:
+            json.dump(dataObject, f, indent=4)
+        os.replace(tmp_file, student_file)
     except Exception:
-        base_obj = {}
+        # best-effort cleanup
+        try:
+            if os.path.exists(tmp_file):
+                os.remove(tmp_file)
+        except Exception:
+            pass
+        return False
 
-    if str(assignment_id) not in base_obj:
-        base_obj[str(assignment_id)] = {}
-    base_student_map = base_obj[str(assignment_id)]
-    if sid not in base_student_map or not isinstance(base_student_map[sid], dict):
-        base_student_map[sid] = {"name": revision_entry.get('name',''), "questions": [], "revisions": []}
-    base_student_map[sid].setdefault('revisions', []).append(to_append)
-    with open(base_file, 'w', encoding='utf-8') as f:
-        json.dump(base_obj, f, indent=4)
-
+    # IMPORTANT: Do not modify the global data/submissions.json here.
+    # The authoritative student-specific record is the per-student file
+    # (data/students/<student_id>/submissions.json) which we updated above.
     return True
-      
+    
 def addToJSON(dataToAdd, dataFileName, assignments=True, assignment_id=-1, student_id=-1):
     """Add dataToAdd to data/<dataFileName>.
     - If assignments=True: treat the file as a list and append, return new length.
