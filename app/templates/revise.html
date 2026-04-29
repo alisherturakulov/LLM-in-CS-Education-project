@@ -30,9 +30,8 @@
         {{ submit.student_id.label}}
         {{ submit.student_id()}}
 
-        {# Use a loop to go through the FieldList #}
-
-        {# for each assignment, pair each error answer with an answerfield and logfield where both should have the same number of elements to match up#}
+        {# Use a loop to go access data for each question #}
+        {# each tuple holds data for different question components #}
         
         {% set qnum = namespace(number=1) %}
         {% for (erroneousAnswer), (answerfield), (logfield), (comment), (input_type) in questions_tuple %}
@@ -60,11 +59,11 @@
                     {{ answerfield.label }}
                     <select name="answers-{{ loop.index0 }}" id="answers-{{ loop.index0 }}">
                         <option value="">Choose...</option>
-                        <option value="0">Mental Typo</option>
-                        <option value="1">Knowledge Gap</option>
-                        <option value="2">Misconception</option>
-                        <option value="3">Wrong Choice</option>
-                        <option value="4">Structural Blindness</option>
+                        <option value="Mental Typo">Mental Typo</option>
+                        <option value="Knowledge Gap">Knowledge Gap</option>
+                        <option value="Misconception">Misconception</option>
+                        <option value="Wrong Choice">Wrong Choice</option>
+                        <option value="Structural Blindness">Structural Blindness</option>
                     </select>
                 {% else %}
                     {{ answerfield.label }}

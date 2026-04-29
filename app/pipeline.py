@@ -7,7 +7,6 @@ from openai import OpenAI
 import base64
 from google import genai
 from google.genai import types
-from google import genai
 
 #load from .env file
 load_dotenv()
@@ -23,46 +22,55 @@ client = genai.Client()
 error_types = []
 
 def generateGemini(prompt, model="gemini-2.0-flash"):#gemini-2.5-flash-lite
-    client = genai.Client(
+  """Call Google GenAI to generate a plain-text completion.
+
+  Returns the response text for the provided `prompt` and `model`.
+  """
+  client = genai.Client(
         api_key=os.environ.get("GEMINI_API_KEY"),
-    )
-    contents = [
+  )
+  contents = [
         types.Content(
             role="user",
             parts=[
                 types.Part.from_text(text=prompt),
             ],
         ),
-    ]
-    if model == "gemini-2.0-flash":
-        generate_content_config = types.GenerateContentConfig(
-            temperature=1,
-            top_p=0.95,
-            top_k=40,
-            max_output_tokens=8192,
-            response_mime_type="text/plain",
+  ]
+  if model == "gemini-2.0-flash":
+    generate_content_config = types.GenerateContentConfig(
+      temperature=1,
+      top_p=0.95,
+      top_k=40,
+      max_output_tokens=8192,
+      response_mime_type="text/plain",
     )
-    elif model in ["gemini-2.5-flash-preview-04-17", "gemini-2.5-pro-preview-05-06"]:
-        generate_content_config = types.GenerateContentConfig(
-          temperature=1.5,
+  elif model in ["gemini-2.5-flash-preview-04-17", "gemini-2.5-pro-preview-05-06"]:
+      generate_content_config = types.GenerateContentConfig(
+        temperature=1.5,
+        response_mime_type="text/plain",
+    )
+  else:
+      generate_content_config = types.GenerateContentConfig(
+          temperature=0.7,
+          top_p=0.95,
+          top_k=64,
+          max_output_tokens=65536,
           response_mime_type="text/plain",
       )
-    else:
-        generate_content_config = types.GenerateContentConfig(
-            temperature=0.7,
-            top_p=0.95,
-            top_k=64,
-            max_output_tokens=65536,
-            response_mime_type="text/plain",
-        )
-    response = client.models.generate_content(
-        model=model,
-        contents=contents,
-        config=generate_content_config)
-    return response.text
+  response = client.models.generate_content(
+      model=model,
+      contents=contents,
+      config=generate_content_config)
+  return response.text
 
 #generate OpenAI response using some model in response to some user content and system_prompt
 def generatorOpenAI(content, model, system_prompt, temperature=1, reasoning_effort="high", use_openai=True):
+  """Return a completion object for `content` using either OpenAI or Gemini.
+
+  The returned object mimics the minimal shape used elsewhere
+  (an object with `choices[0].message.content` and `usage`).
+  """
   completion = "<LLM API completion>"
   if(use_openai):
     if model == "o3-mini":
@@ -265,6 +273,12 @@ error_definitions_examine1 = system_prompt_generate1[system_prompt_generate1.ind
 # 2) generate a error type of the question
 # 3) examine the generated type: if match, pass; otherwise, redo step3 till match
 def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, use_openai:bool=True):
+  """Attempt to generate and verify one example per error class.
+
+  This orchestration repeatedly generates candidate errorful answers and
+  runs an examiner until the produced answer is classified as the
+  intended error class. Returns a log mapping error class -> details.
+  """
   log = {str(error_class):None for error_class in range(1,6)}
   for error_class in range(1, 6): # error_class: int
     log[str(error_class)] = {"generation history": [], # list of str
@@ -348,6 +362,11 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, u
 #use pipeline from notebook
 #questions data a list of dicts
 def generate_questions(questions_data=None, use_openai:bool=False):
+  """Turn form input into the internal assignment structure.
+
+  Each entry returned is a dict with keys `question`, `error answers`,
+  `error classes` and `input_type` (one of 'text','highlight','select').
+  """
   answer=""#generate correct solution
   if(not questions_data):
     question_element = {
@@ -457,13 +476,13 @@ def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', u
     prev = prior_answers[i] if i < len(prior_answers) else None
     # build prompt
     prompt = f"Question: {item['question']}\n"
-    prompt += f"Original (erroneous) solution which the student was supposed to identify the error in: {item['erroneous']}\n"
+    prompt += f"Original (erroneous) solution which the student needs to identify the error in: {item['erroneous']}\n"
     prompt += f"Expected error type (index) student should identify in the erroneous solution: {item['expected']}\n"
     prompt += f"Types of errors: {system_prompt_generate1[system_prompt_generate1.index("1."):]}\n"
-    prompt += f"Student's revised answer: {student_answer or '[no answer]'}\n"
+    prompt += f"Student's revised answer (<select> type tag answer will only have one or two words): {student_answer or '[no answer]'}\n"
     if prev:
       prompt += f"Previous attempt at finding the error in the erroneous solution: {prev}\n"
-      prompt += "Compare the previous attempt with the student's revised answer and give concise, specific feedback focused on what changed, what remains wrong (if anything), and one actionable suggestion to improve.\n"
+      prompt += "Compare the previous attempt with the student's revised answer and give concise, specific feedback focused on what changed, what remains wrong (only if theres something wrong), and one actionable suggestion to improve.\n"
     else:
       prompt += "Give concise, specific feedback identifying the error in the original solution and one actionable suggestion for the student to revise their answer (if revision necessary).\n"
 

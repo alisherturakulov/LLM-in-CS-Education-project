@@ -3,7 +3,12 @@
 {%block body%}
     {% if view %}
         <h1>Assignment {{ assignment_id }}</h1>
-
+        {% set error_classes = ['Mental Typo',
+        'Knowledge Gap',
+        'Misconception',
+        'Wrong Choice',
+        'Structural Blindness']
+        %}
         <h3>Submission</h3>
         <div id="submissionViewBox" >
             {% for qgroup in questions %}
@@ -13,9 +18,9 @@
                             {% if question.question %}
                                 <p class="question">{{ question.question }}</p>
                             {% endif %}
-                            <p class="erroneousAnswer">{{ question.erroneousAnswer }}</p>
-                            <p class="expected">{{ question.error_class }}</p>
-                            <p class="answer">{{ question.answer }}</p>
+                            <p class="erroneousAnswer">Solution with error: {{ question.erroneousAnswer }}</p>
+                            <p class="expected">Expected: {{  error_classes[ question.error_class | int ]  }}</p>
+                            <p class="answer">Answer: {{ question.answer }}</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -33,13 +38,13 @@
                                 {{ revision.question}}
                             </p>
                             <p class="erroneousAnswer">
-                                {{revision.erroneousAnswer}}
+                                Solution with error: {{revision.erroneousAnswer}}
                             </p>
                             <p class="expected">
-                                {{revision.error_class}}
+                                Expected error class: {{  error_classes[ revision.error_class | int ]  }}
                             </p>
                             <p class="answer">
-                                {{revision.answer}}
+                                Answer: {{revision.answer}}
                             </p>
                             <p class="comment">
                                 {{revision.comment}}

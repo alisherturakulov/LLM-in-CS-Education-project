@@ -79,7 +79,7 @@ p.question {
 
 p.erroneousAnswer, p.expected, p.answer {
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 300;
     color: #142734;
     margin-bottom: 6px ;
     line-height: 1.4;

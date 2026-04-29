@@ -54,9 +54,27 @@ document.addEventListener('DOMContentLoaded', () => {
       input.addEventListener('input', save);
    }
 
+   // Auto-save for select controls: record selected option text into the log when changed
+   function attachAutoSaveToSelect(select){
+      const m = select.name && select.name.match(/answers-(\d+)/);
+      const idx = m ? m[1] : null;
+      const log = idx !== null ? document.querySelector(`input[name='answer_logs-${idx}']`) : null;
+      if (!log) return;
+
+      const save = function(){
+         const currentTime = new Date().toLocaleString();
+         const text = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : select.value;
+         log.value += `${currentTime} : ${text};`;
+      };
+
+      select.addEventListener('change', save);
+   }
+
    // wire up all answer inputs and corresponding paragraphs
    const answerInputs = document.querySelectorAll("input[name^='answers']");
    answerInputs.forEach((input) => { attachAutoSaveToAnswer(input); });
+   const answerSelects = document.querySelectorAll("select[name^='answers']");
+   answerSelects.forEach((s) => { attachAutoSaveToSelect(s); });
 
    const errorParas = document.querySelectorAll('p.erroneousAnswer');
    errorParas.forEach((p) => recordHighlightOnParagraph(p));
