@@ -33,5 +33,5 @@ flask run
 ```bash
 #hosts on all addresses
 flask run --host 0.0.0.0
-#ctr-C to stop
+#ctrl-C to stop
 ```

@@ -1375,6 +1375,64 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "What is the area of a 4 cm by 5 cm rectangle",
+                            "answers": [
+                                "Mental Typo"
+                            ],
+                            "expected": [
+                                "3"
+                            ],
+                            "answer history": [
+                                "5/1/2026, 6:30:16 PM : Mental Typo;"
+                            ],
+                            "comments": [
+                                "Your revised answer correctly identifies that the student made a \"Mental Typo.\" However, the specific error in the original solution was confusing addition with multiplication. For your next revision, try to pinpoint the exact calculation error the student made."
+                            ],
+                            "highlights": [
+                                []
+                            ],
+                            "error answers": [
+                                "A: To find the area of a rectangle, you multiply the length by the width. So, the area is 4 cm + 5 cm = 9 cm.\nE: The student confused addition with multiplication when calculating the area of a rectangle."
+                            ],
+                            "input types": [
+                                "select"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "questions": [
+                        {
+                            "name": "Ali",
+                            "question": "What is the area of a 4 cm by 5 cm rectangle",
+                            "answers": [
+                                ""
+                            ],
+                            "expected": [
+                                "3"
+                            ],
+                            "answer history": [
+                                ""
+                            ],
+                            "comments": [
+                                "No answer submitted \u2014 try writing a short explanation of your steps."
+                            ],
+                            "highlights": [
+                                []
+                            ],
+                            "error answers": [
+                                "A: To find the area of a rectangle, you multiply the length by the width. So, the area is 4 cm + 5 cm = 9 cm.\nE: The student confused addition with multiplication when calculating the area of a rectangle."
+                            ],
+                            "input types": [
+                                "select"
+                            ]
+                        }
+                    ]
                 }
             ]
         }
