@@ -167,3 +167,24 @@ input.inline {
 }
 
 .commentControls small { color: #6b7280; }
+
+/* View page revisions side comments */
+.revRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+.revMain { flex: 1 1 auto; }
+.revSide { width: 260px; flex: 0 0 260px; }
+.side-comment {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 6px 14px rgba(16,24,40,0.04);
+}
+.side-snip { font-weight:600; font-size:0.95rem; color:#0f172a; margin-bottom:6px }
+.side-text { font-size:0.9rem; color:#334155 }
+.side-empty { color:#94a3b8; font-size:0.9rem }

@@ -556,7 +556,8 @@ def view():
                             'erroneousAnswer': q.get('error answers', [])[i] if i < len(q.get('error answers', [])) else '',
                             'error_class': q.get('expected', [])[i] if i < len(q.get('expected', [])) else '',
                             'answer': ans,
-                            'comment': q.get('comments', [])[i] if i < len(q.get('comments', [])) else ''
+                            'comment': q.get('comments', [])[i] if i < len(q.get('comments', [])) else '',
+                            'highlights': (q.get('highlights', []) and (q.get('highlights', [])[i] if i < len(q.get('highlights', [])) else [])) or []
                         })
                 grouped_revisions.append(group)
             elif isinstance(rev, dict) and 'question' in rev:
@@ -568,7 +569,8 @@ def view():
                         'erroneousAnswer': rev.get('error answers', [])[i] if i < len(rev.get('error answers', [])) else '',
                         'error_class': rev.get('expected', [])[i] if i < len(rev.get('expected', [])) else '',
                         'answer': ans,
-                        'comment': rev.get('comments', [])[i] if i < len(rev.get('comments', [])) else ''
+                        'comment': rev.get('comments', [])[i] if i < len(rev.get('comments', [])) else '',
+                        'highlights': (rev.get('highlights', []) and (rev.get('highlights', [])[i] if i < len(rev.get('highlights', [])) else [])) or []
                     })
                 grouped_revisions.append(group)
 

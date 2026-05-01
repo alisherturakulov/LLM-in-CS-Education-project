@@ -33,22 +33,28 @@
                 <div class="revisionGroup">
                     <h5>Revision {{ loop.index }}</h5>
                     {% for revision in rev_group %}
-                        <div class="questionGroup">
-                            <p class="question">
-                                {{ revision.question}}
-                            </p>
-                            <p class="erroneousAnswer">
-                                Solution with error: {{revision.erroneousAnswer}}
-                            </p>
-                            <p class="expected">
-                                Expected error class: {{  error_classes[ revision.error_class | int ]  }}
-                            </p>
-                            <p class="answer">
-                                Answer: {{revision.answer}}
-                            </p>
-                            <p class="comment">
-                                {{revision.comment}}
-                            </p>
+                        <div class="revRow">
+                            <div class="revMain">
+                                <div class="questionGroup">
+                                    <p class="question">{{ revision.question}}</p>
+                                    <p class="erroneousAnswer">Solution with error: {{revision.erroneousAnswer}}</p>
+                                    <p class="expected">Expected error class: {{  error_classes[ revision.error_class | int ]  }}</p>
+                                    <p class="answer">Answer: {{revision.answer}}</p>
+                                    <p class="comment">{{revision.comment}}</p>
+                                </div>
+                            </div>
+                            <div class="revSide">
+                                {% if revision.highlights %}
+                                    {% for h in revision.highlights %}
+                                        <div class="side-comment">
+                                            <div class="side-snip">{{ h.text }}</div>
+                                            <div class="side-text">{{ h.comment }}</div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="side-empty">No inline comments</div>
+                                {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
