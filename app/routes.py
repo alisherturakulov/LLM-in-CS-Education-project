@@ -395,12 +395,17 @@ def revise(assignment_id):
         all_erroneous = []
         all_comments = []
 
+        # collect highlight/comment JSON blobs submitted from client (one per flat erroneous-answer index)
+        flat_highlights_raw = [request.form.get(f'highlight_comments-{i}', '[]') for i in range(flat_count)]
+
         # collect per-question revision dicts, then save them as a single
         # grouped revision object so one revision contains all related
         # question dicts under the 'questions' key
         per_question_revisions = []
 
         for question_element in current_assignment_dict:
+            # remember start index for slicing flat highlights for this question
+            start_idx = answerIndex
             result = {"name": student_name, "question": question_element.get("question", ""), "answers": [], "expected": [], "answer history": []}
             for errorIndex in range(len(question_element.get("error classes", []))):
                 result["answers"].append(answers[answerIndex] if answerIndex < len(answers) else "")
@@ -441,6 +446,20 @@ def revise(assignment_id):
                 # fallback to placeholders
                 comments_for_q = ["(No comments generated)" for _ in result.get('answers', [])]
 
+            # slice highlight JSONs for this question from the flat list and parse
+            highlights_for_q = []
+            try:
+                count = len(result.get('answers', []))
+                for j in range(start_idx, start_idx + count):
+                    raw = flat_highlights_raw[j] if j < len(flat_highlights_raw) else '[]'
+                    try:
+                        parsed = json.loads(raw) if raw else []
+                    except Exception:
+                        parsed = []
+                    highlights_for_q.append(parsed)
+            except Exception:
+                highlights_for_q = []
+
             # build per-question revision dict
             revision_entry = {
                 'name': result.get('name',''),
@@ -449,6 +468,7 @@ def revise(assignment_id):
                 'expected': result.get('expected',[]),
                 'answer history': result.get('answer history',[]),
                 'comments': comments_for_q,
+                'highlights': highlights_for_q,
                 'error answers': question_element.get('error answers', []),
                 'input types': question_element.get('input_types') or [ question_element.get('input_type','text') for _ in range(len(question_element.get('error classes', []))) ]
             }

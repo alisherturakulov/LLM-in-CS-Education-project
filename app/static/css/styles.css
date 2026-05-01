@@ -149,3 +149,21 @@ input.inline {
     text-decoration: none;
     field-sizing:content;
 }
+
+/* Revision comment UI */
+.commentBox {
+    width: 280px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.highlightsList {
+    margin: 8px 0 12px 0;
+}
+.hl-item {
+    background: #fafafa;
+    border-radius: 6px;
+}
+
+.commentControls small { color: #6b7280; }
