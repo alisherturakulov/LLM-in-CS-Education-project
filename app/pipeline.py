@@ -7,6 +7,7 @@ from openai import OpenAI
 import base64
 from google import genai
 from google.genai import types
+import json
 
 #load from .env file
 load_dotenv()
@@ -272,87 +273,105 @@ error_definitions_examine1 = system_prompt_generate1[system_prompt_generate1.ind
 # 1) receive a question, generate its step by step sol (could have minor mistakes in it) (step by step answer is generated given correct answer)
 # 2) generate a error type of the question
 # 3) examine the generated type: if match, pass; otherwise, redo step3 till match
-def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, use_openai:bool=True):
-  """Attempt to generate and verify one example per error class.
+def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, use_openai:bool=True, error_classes=None):
+  """Attempt to generate and verify examples for the specified error classes.
 
-  This orchestration repeatedly generates candidate errorful answers and
-  runs an examiner until the produced answer is classified as the
-  intended error class. Returns a log mapping error class -> details.
+  If `error_classes` is None, the function falls back to generating all
+  five classes (1..5). Otherwise it only generates and returns logs for
+  the provided classes. Returns a dict mapping error-class-string -> log.
   """
-  log = {str(error_class):None for error_class in range(1,6)}
-  for error_class in range(1, 6): # error_class: int
-    log[str(error_class)] = {"generation history": [], # list of str
-                             "generation dialogue history": [],
-                             "generation time history": [],
-                             "generation input tokens history": [],
-                             "generation output tokens history": [],
-                             "generation reasoning tokens history": [],
-                             "re-do counts": None, # int
-                             "examination classification history": [],
-                             "examination justification history": [],
-                             "examination dialogue history": [],
-                             "examination time history": [],
-                             "examination input tokens history": [],
-                             "examination output tokens history": [],
-                             "examination reasoning tokens history": [],
-                             "final output": None, # one single str
-                             "final dialogue history": [],
-                             "final output time": None,
-                             "final input tokens": None,
-                             "final output tokens": None,
-                             "final reasoning tokens": None
-                            }
+  # normalize requested classes to a list of ints in the valid range 1..5
+  if error_classes is None:
+    classes = list(range(1, 6))
+  else:
+    classes = []
+    for c in error_classes:
+      try:
+        ci = int(c)
+        if 1 <= ci <= 5:
+          classes.append(ci)
+      except Exception:
+        # ignore invalid entries
+        continue
+    if not classes:
+      # fall back to generating at least one error example (Mental Typo)
+      classes = [1]
+
+  log = {str(ec): None for ec in classes}
+  for error_class in classes: # error_class: int
+    key = str(error_class)
+    log[key] = {"generation history": [], # list of str
+                 "generation dialogue history": [],
+                 "generation time history": [],
+                 "generation input tokens history": [],
+                 "generation output tokens history": [],
+                 "generation reasoning tokens history": [],
+                 "re-do counts": None, # int
+                 "examination classification history": [],
+                 "examination justification history": [],
+                 "examination dialogue history": [],
+                 "examination time history": [],
+                 "examination input tokens history": [],
+                 "examination output tokens history": [],
+                 "examination reasoning tokens history": [],
+                 "final output": None, # one single str
+                 "final dialogue history": [],
+                 "final output time": None,
+                 "final input tokens": None,
+                 "final output tokens": None,
+                 "final reasoning tokens": None
+                }
     examination_result = "0"
     examination_feedback = ""
-    while examination_result != str(error_class):
+    while examination_result != key:
       # generate a type of a question
       time1 = time.time()
       if examination_feedback == "":
-        generation_completion = generatorOpenAI(prompt_generate.format(str(error_class), question, answer), model_generate, system_prompt_generate1, use_openai=use_openai)
+        generation_completion = generatorOpenAI(prompt_generate.format(key, question, answer), model_generate, system_prompt_generate1, use_openai=use_openai)
       else:
-        generation_completion = generatorOpenAI(prompt_generate_feedback.format(str(error_class), question, answer, examination_result, examination_feedback), model_generate, system_prompt_generate1, use_openai=use_openai)
+        generation_completion = generatorOpenAI(prompt_generate_feedback.format(key, question, answer, examination_result, examination_feedback), model_generate, system_prompt_generate1, use_openai=use_openai)
       time2 = time.time()
       generated_error_response = generation_completion.choices[0].message.content
 
-      log[str(error_class)]['generation history'].append(generated_error_response)
+      log[key]['generation history'].append(generated_error_response)
       if examination_feedback == "":
-        log[str(error_class)]['generation dialogue history'].append(prompt_generate.format(str(error_class), question, answer) + "\n\n" + generated_error_response)
+        log[key]['generation dialogue history'].append(prompt_generate.format(key, question, answer) + "\n\n" + generated_error_response)
       else:
-        log[str(error_class)]['generation dialogue history'].append(prompt_generate_feedback.format(str(error_class), question, answer, examination_result, examination_feedback) + "\n\n" + generated_error_response)
-      log[str(error_class)]['generation time history'].append(time2-time1)
-      log[str(error_class)]['generation input tokens history'].append(generation_completion.usage.prompt_tokens)
-      log[str(error_class)]['generation output tokens history'].append(generation_completion.usage.completion_tokens)
-      log[str(error_class)]['generation reasoning tokens history'].append(generation_completion.usage.completion_tokens_details.reasoning_tokens)
+        log[key]['generation dialogue history'].append(prompt_generate_feedback.format(key, question, answer, examination_result, examination_feedback) + "\n\n" + generated_error_response)
+      log[key]['generation time history'].append(time2-time1)
+      log[key]['generation input tokens history'].append(generation_completion.usage.prompt_tokens)
+      log[key]['generation output tokens history'].append(generation_completion.usage.completion_tokens)
+      log[key]['generation reasoning tokens history'].append(generation_completion.usage.completion_tokens_details.reasoning_tokens)
 
 
       # examine the error class
       time3 = time.time()
-      examination_completion = generatorOpenAI(prompt_examine.format(error_definitions_examine1, question, answer, str(error_class), generated_error_response), model_examine, system_prompt_examine, use_openai=use_openai)
+      examination_completion = generatorOpenAI(prompt_examine.format(error_definitions_examine1, question, answer, key, generated_error_response), model_examine, system_prompt_examine, use_openai=use_openai)
       time4 = time.time()
       examination_justification = examination_completion.choices[0].message.content
       examination_result = generatorOpenAI(prompt_examine_extract.format(examination_justification), model_examine, "You're a useful agent on extracting information.", use_openai=use_openai).choices[0].message.content
-      if examination_result != str(error_class):
+      if examination_result != key:
         examination_feedback = examination_justification
 
-      log[str(error_class)]['examination classification history'].append(examination_result)
-      log[str(error_class)]['examination justification history'].append(examination_justification)
-      log[str(error_class)]['examination dialogue history'].append(prompt_examine.format(error_definitions_examine1, question, answer, str(error_class), generated_error_response) + "\n\n" + examination_result)
-      log[str(error_class)]['examination time history'].append(time4-time3)
-      log[str(error_class)]['examination input tokens history'].append(examination_completion.usage.prompt_tokens)
-      log[str(error_class)]['examination output tokens history'].append(examination_completion.usage.completion_tokens)
-      log[str(error_class)]['examination reasoning tokens history'].append(examination_completion.usage.completion_tokens_details.reasoning_tokens)
+      log[key]['examination classification history'].append(examination_result)
+      log[key]['examination justification history'].append(examination_justification)
+      log[key]['examination dialogue history'].append(prompt_examine.format(error_definitions_examine1, question, answer, key, generated_error_response) + "\n\n" + examination_result)
+      log[key]['examination time history'].append(time4-time3)
+      log[key]['examination input tokens history'].append(examination_completion.usage.prompt_tokens)
+      log[key]['examination output tokens history'].append(examination_completion.usage.completion_tokens)
+      log[key]['examination reasoning tokens history'].append(examination_completion.usage.completion_tokens_details.reasoning_tokens)
 
 
       # take a break
       time.sleep(2)
 
-    log[str(error_class)]['re-do counts'] = len(log[str(error_class)]['generation history'])-1
-    log[str(error_class)]['final output'] = log[str(error_class)]['generation history'][-1]
-    log[str(error_class)]['final dialogue history'] = log[str(error_class)]['generation dialogue history'][-1]
-    log[str(error_class)]['final output time'] = log[str(error_class)]['generation time history'][-1]
-    log[str(error_class)]['final input tokens'] = log[str(error_class)]['generation input tokens history'][-1]
-    log[str(error_class)]['final output tokens'] = log[str(error_class)]['generation output tokens history'][-1]
-    log[str(error_class)]['final reasoning tokens'] = log[str(error_class)]['generation reasoning tokens history'][-1]
+    log[key]['re-do counts'] = len(log[key]['generation history'])-1
+    log[key]['final output'] = log[key]['generation history'][-1]
+    log[key]['final dialogue history'] = log[key]['generation dialogue history'][-1]
+    log[key]['final output time'] = log[key]['generation time history'][-1]
+    log[key]['final input tokens'] = log[key]['generation input tokens history'][-1]
+    log[key]['final output tokens'] = log[key]['generation output tokens history'][-1]
+    log[key]['final reasoning tokens'] = log[key]['generation reasoning tokens history'][-1]
 
     print(f"\r Error class {error_class} is done!", end="")
     time.sleep(1)
@@ -361,21 +380,16 @@ def pipeline2(question:str, answer:str, model_generate:str, model_examine:str, u
 
 #use pipeline from notebook
 #questions data a list of dicts
-def generate_questions(questions_data=None, use_openai:bool=False):
+def generate_questions(questions_data=None, use_openai:bool=True):
   """Turn form input into the internal assignment structure.
 
   Each entry returned is a dict with keys `question`, `error answers`,
   `error classes` and `input_type` (one of 'text','highlight','select').
   """
   answer=""#generate correct solution
-  if(not questions_data):
-    question_element = {
-      "question":"placeholder question",
-      "error answers":["This is an erroneous answer"],
-      "error classes": ["0"],
-    }
-    questions_data = {"question":"placeholder q", "error_type":"0"}
-    return {question_element}
+  # If no questions were provided, return an empty list (nothing to generate).
+  if not questions_data:
+    return []
   
   model_generate = "gpt-5-mini"
   model_examine = "gpt-5-mini"
@@ -398,10 +412,34 @@ def generate_questions(questions_data=None, use_openai:bool=False):
     }
     current_question = question_field_dict["question"]
     answer="generate correct answer"#maybe generate correct answer
-    error_classes = question_field_dict["error_types"]
+    # Accept several possible keys from form frontend and normalize
+    error_classes_raw = question_field_dict.get("error_types") or question_field_dict.get("error_type") or question_field_dict.get("errorTypes") or []
+    # ensure a list of strings
+    if isinstance(error_classes_raw, str):
+      error_classes_raw = [error_classes_raw]
+    if error_classes_raw is None:
+      error_classes_raw = []
+    # filter to valid error class strings '1'..'5'
+    error_classes = []
+    for ec in error_classes_raw:
+      try:
+        s = str(ec).strip()
+        if s == '':
+          continue
+        iv = int(s)
+        # support both 0-based (form uses 0..4) and 1-based (1..5) indices
+        if 0 <= iv <= 4:
+          error_classes.append(str(iv + 1))
+        elif 1 <= iv <= 5:
+          error_classes.append(str(iv))
+      except Exception:
+        continue
+    if not error_classes:
+      # default to class 1 (Mental Typo) if none provided
+      error_classes = ['1']
     question_element["question"] = current_question
     # include the input type (0=text,1=highlight,2=select) for rendering and storage
-    atype = question_field_dict.get('answer_type', '')
+    atype = question_field_dict.get('answer_type', '') or question_field_dict.get('answerType', '')
     # normalize to human readable key
     if str(atype) == '1':
       question_element['input_type'] = 'highlight'
@@ -410,18 +448,22 @@ def generate_questions(questions_data=None, use_openai:bool=False):
     else:
       question_element['input_type'] = 'text'
     try:#incase api error
-      pipeline_log =None# pipeline2(current_question, answer, model_generate, model_examine, use_openai=use_openai)
-      generated_erroneous_solutions = [(pipeline_log[error_class]['final output']) for error_class in error_classes] or None
-      question_element["error answers"] = generated_erroneous_solutions or ["generated solution goes here; uncomment pipeline call first" for i in range(len(error_classes))]
+      # generate only the requested error classes for this question
+      pipeline_log = pipeline2(current_question, answer, model_generate, model_examine, use_openai=use_openai, error_classes=error_classes)
+      # preserve original ordering of error_classes when extracting outputs
+      raw_solutions = [ pipeline_log.get(str(ec), {}) and pipeline_log.get(str(ec), {}).get('final output') for ec in error_classes ]
+      # replace None entries with a placeholder so downstream code can iterate safely
+      generated_erroneous_solutions = [ (s if (s is not None and s != '') else "(no generated solution)") for s in raw_solutions ]
+      question_element["error answers"] = generated_erroneous_solutions
       question_element["error classes"] = error_classes
       generated_error_questions.append(question_element)
-    except Exception as e:#add a placeholder element
-      print("Error:\n")
+    except Exception as e: # add a safe placeholder element but preserve question text
+      print("Error in generate_questions:\n")
       print(e)
       question_element = {
-        "question":current_question,
-        "error answers":["This is an erroneous answer"],
-        "error classes": ["0"],
+        "question": current_question or "(no question provided)",
+        "error answers": ["(no generated erroneous solution)" for _ in range(len(error_classes))],
+        "error classes": error_classes or ['1'],
       }
       generated_error_questions.append(question_element)
   return generated_error_questions
@@ -453,7 +495,7 @@ def _flatten_assignment(assignment):
       flat.append({'question': question_text, 'erroneous': ea, 'expected': str(cls)})
   return flat
 
-def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', use_openai=False):
+def check_answers(answers, assignment, prior_answers=None, model='gpt-5-mini', use_openai=True):
   """Generate concise revision feedback comments for each answer.
 
   - answers: list of student's answer strings (flat order matching assignment)

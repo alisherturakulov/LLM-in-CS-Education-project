@@ -5,6 +5,27 @@ from app.pipeline import generate_questions, check_answers
 from app.forms import Login, Signup, CreateAssignment, Submit, Search
 import os, json
 
+# Toggle whether to use OpenAI for comment generation. Set env var COMMENT_USE_OPENAI=1 (or true)
+def _env_to_bool(names, default=False):
+    for name in names:
+        val = os.environ.get(name)
+        if val is None:
+            continue
+        v = str(val).strip().lower()
+        if v in ('1', 'true', 'yes', 'y', 'on'):
+            return True
+        if v in ('0', 'false', 'no', 'n', 'off', ''):
+            return False
+        # try numeric fallback
+        try:
+            return bool(int(v))
+        except Exception:
+            continue
+    return default
+
+# Recognize multiple env var names for convenience; default to False (use Gemini)
+COMMENT_USE_OPENAI = _env_to_bool(['COMMENT_USE_OPENAI', 'USE_OPENAI', 'USEOPENAI', 'useopenai'], default=False)
+
 # Using Flask session to track login state instead of global variable
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,7 +79,7 @@ def create_questions():
         questions_for_generating = assign_form.questions.data
         print("questions_for_generating: " + str(assign_form.questions.data))
         #shouls generate a list of dictionaries with
-        generated_error_questions = generate_questions(questions_for_generating, use_openai=False)
+        generated_error_questions = generate_questions(questions_for_generating, use_openai=COMMENT_USE_OPENAI)
         print("Generated_error_questions:\n"+ str(generated_error_questions))
         #to be accessed later in /submit-assignment
         #assignments.append(generated_error_questions)
@@ -303,7 +324,7 @@ def revise(assignment_id):
                                 prior_answers = qsub.get('answers', [])
                                 # generate comments for these answers using check_answers
                                 try:
-                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=False)
+                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=COMMENT_USE_OPENAI)
                                 except Exception:
                                     comments_for_q = ["(No comment generated)"] * len(prior_answers)
                                 comment = comments_for_q[i] if i < len(comments_for_q) else comment
@@ -314,7 +335,7 @@ def revise(assignment_id):
                             if existing_entry.get('question','') == q.get('question',''):
                                 prior_answers = existing_entry.get('answers', [])
                                 try:
-                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=False)
+                                    comments_for_q = check_answers(prior_answers, [q], prior_answers=None, use_openai=COMMENT_USE_OPENAI)
                                 except Exception:
                                     comments_for_q = ["(No comment generated)"] * len(prior_answers)
                                 comment = comments_for_q[i] if i < len(comments_for_q) else comment
@@ -415,7 +436,7 @@ def revise(assignment_id):
 
             # call check_answers to generate comments for each answer for this question
             try:
-                comments_for_q = check_answers(result.get('answers', []), [question_element], prior_answers=prior_for_question, use_openai=False)
+                comments_for_q = check_answers(result.get('answers', []), [question_element], prior_answers=prior_for_question, use_openai=COMMENT_USE_OPENAI)
             except Exception:
                 # fallback to placeholders
                 comments_for_q = ["(No comments generated)" for _ in result.get('answers', [])]

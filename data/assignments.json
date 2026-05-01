@@ -415,5 +415,63 @@
                 "select"
             ]
         }
+    ],
+    [
+        {
+            "question": "What is the area of a 4 cm by 5 cm rectangle",
+            "error answers": [
+                "This is an erroneous answer"
+            ],
+            "error classes": [
+                "0"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        }
+    ],
+    [
+        {
+            "question": "What is the area of a 4 cm by 5 cm rectangle",
+            "error answers": [
+                "(no generated erroneous solution)"
+            ],
+            "error classes": [
+                "1"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        },
+        {
+            "question": "What is the length of a rectangle's diagonal?",
+            "error answers": [
+                "(no generated erroneous solution)"
+            ],
+            "error classes": [
+                "3"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        }
+    ],
+    [
+        {
+            "question": "What is the area of a 4 cm by 5 cm rectangle",
+            "error answers": [
+                "A: To find the area of a rectangle, you multiply the length by the width. So, the area is 4 cm + 5 cm = 9 cm.\nE: The student confused addition with multiplication when calculating the area of a rectangle."
+            ],
+            "error classes": [
+                "3"
+            ],
+            "input_type": "select",
+            "input_types": [
+                "select"
+            ]
+        }
     ]
 ]
